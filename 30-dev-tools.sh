@@ -1,18 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 1) eza (modern ls)
-sudo mkdir -p /etc/apt/keyrings
+# 1) eza keyring & repo
+KEYRING="/etc/apt/keyrings/eza.gpg"
+LIST="/etc/apt/sources.list.d/eza.list"
+
+# ensure keyring dir
+sudo install -d -m 0755 /etc/apt/keyrings
+
+# download the key
 wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc \
-  | sudo gpg --dearmor -o /etc/apt/keyrings/eza.gpg
-echo "deb [signed-by=/etc/apt/keyrings/eza.gpg] http://deb.gierens.de stable main" \
-  | sudo tee /etc/apt/sources.list.d/eza.list
-sudo chmod 644 /etc/apt/keyrings/eza.gpg /etc/apt/sources.list.d/eza.list
+  | sudo gpg --dearmor -o "$KEYRING"
+
+# remove any old conflicting file
+sudo rm -f /etc/apt/sources.list.d/gierens.list
+
+# add the repo if missing
+if ! grep -Rqs "^deb .\+gierens\.de" /etc/apt/sources.list.d; then
+  echo "deb [signed-by=$KEYRING] http://deb.gierens.de stable main" \
+    | sudo tee "$LIST" >/dev/null
+fi
+
+sudo chmod 644 "$KEYRING" "$LIST"
 sudo apt update
 sudo apt install -y eza
 
 # 2) just (task runner)
-sudo snap install just --classic
+if ! command -v just >/dev/null; then
+  sudo snap install just --classic
+fi
 
 # 3) aliases
 ZSH_ALIASES="$HOME/.zsh_aliases"
