@@ -66,6 +66,29 @@ fi
 ##############################################################################
 print_section "Installing lazydocker"
 
+# ---- START DEBUG BLOCK ----
+echo "--- LAZYDOCKER DEBUG ---"
+echo "[Info] Running check as user: $(whoami)"
+echo "[Info] Target user for installation is: $TARGET_USER"
+
+if command -v lazydocker >/dev/null; then
+    LAZYDOCKER_PATH=$(which lazydocker)
+    echo "[Debug] 'which lazydocker' for root points to: $LAZYDOCKER_PATH"
+    echo "[Debug] Permissions for that file are:"
+    ls -l "$LAZYDOCKER_PATH"
+else
+    echo "[Debug] 'command -v lazydocker' failed for root."
+fi
+
+echo "[Debug] Now, attempting to run '--version' as TARGET_USER..."
+if sudo -u "$TARGET_USER" lazydocker --version >/dev/null 2>&1; then
+    echo "[Debug] SUCCESS: Target user '$TARGET_USER' CAN run lazydocker."
+else
+    echo "[Debug] FAILURE: Target user '$TARGET_USER' CANNOT run lazydocker. This is the problem."
+fi
+echo "--- END DEBUG ---"
+# ---- END DEBUG BLOCK ----
+
 if ! command -v lazydocker >/dev/null || ! lazydocker --version >/dev/null 2>&1; then
     echo "Installing lazydocker..."
 
