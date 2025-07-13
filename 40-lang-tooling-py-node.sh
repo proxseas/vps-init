@@ -55,23 +55,25 @@ echo "✔  uv installed."
 # ---- install fnm (fast Node version manager) ----
 sudo -u "$TARGET_USER" bash -c 'curl -fsSL https://fnm.vercel.app/install | bash'
 
-# add to .zshrc if missing
-sudo -u "$TARGET_USER" bash -c "grep -q 'fnm env' \"$TARGET_ZSHRC\" 2>/dev/null || cat >> \"$TARGET_ZSHRC\" <<'EOF'
-# ---- fnm ----
-export PATH=\"\$HOME/.local/share/fnm:\$PATH\"   # fnm binary lives here
-eval \"\$(fnm env --use-on-cd)\"
-EOF"
-
+# Note: fnm installer automatically adds configuration to .zshrc
 echo "✔  fnm installed."
 
 ##############################################################################
 # 3.  Optional: first-time tool versions
 ##############################################################################
 # Fast latest LTS Node and corepack front-end (pnpm, yarn):
+# Set up PATH manually to avoid sourcing .zshrc from bash
 sudo -u "$TARGET_USER" bash -c "
-  source \"$TARGET_ZSHRC\"             # bring fnm into current shell
-  fnm install --lts
-  corepack enable
+  export PATH=\"$TARGET_HOME/.local/share/fnm:\$PATH\"
+
+  # Check if fnm binary exists
+  if [ -f \"$TARGET_HOME/.local/share/fnm/fnm\" ]; then
+    eval \"\$(\"$TARGET_HOME/.local/share/fnm/fnm\" env --use-on-cd)\"
+    fnm install --lts || echo 'fnm install failed, continuing...'
+    corepack enable || echo 'corepack enable failed, continuing...'
+  else
+    echo 'fnm binary not found, skipping Node.js installation'
+  fi
 "
 
 # Example: create an isolated project with uv + Node:
@@ -79,4 +81,8 @@ sudo -u "$TARGET_USER" bash -c "
 #   uv venv              # Lightning-fast venv
 #   fnm use --install    # Pick Node version per-dir via .node-version
 
-echo -e "\nDone.  Open a new terminal or \`exec zsh\` to start using uv and fnm."
+echo -e "\n✔  Language tooling setup complete!"
+echo "To use uv and fnm:"
+echo "1. Open a new terminal or run: exec zsh"
+echo "2. Test: uv --version && fnm --version && node --version"
+echo "3. Your PATH has been updated in ~/.zshrc"
