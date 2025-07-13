@@ -47,8 +47,8 @@ check_command() {
             result=true
         fi
     else
-        # Check for command/binary
-        if command -v "$cmd" >/dev/null 2>&1; then
+        # Check for command/binary with full environment context
+        if zsh -c "source ~/.zshrc 2>/dev/null && command -v $cmd" >/dev/null 2>&1 || command -v "$cmd" >/dev/null 2>&1; then
             result=true
         fi
     fi
@@ -198,7 +198,10 @@ check_command "npm" "npm"
 check_command "docker" "Docker"
 # Check lazydocker with more specific path checking
 TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-if command -v lazydocker >/dev/null 2>&1 || [[ -f "/usr/local/bin/lazydocker" ]]; then
+# Check in multiple ways: command -v, direct path, and with shell context
+if command -v lazydocker >/dev/null 2>&1 || \
+   [[ -f "/usr/local/bin/lazydocker" && -x "/usr/local/bin/lazydocker" ]] || \
+   zsh -c "source ~/.zshrc 2>/dev/null && command -v lazydocker" >/dev/null 2>&1; then
     [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} lazydocker"
     PASSED_CHECKS=$((PASSED_CHECKS + 1))
 else
@@ -219,7 +222,8 @@ check_command "z" "z function (zoxide)" "true"
 # PATH
 [[ "$VERBOSE" == "true" ]] && print_section "PATH"
 TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-if echo "$PATH" | grep -q "$HOME/.local/bin"; then
+# Check both current PATH and shell-loaded PATH
+if echo "$PATH" | grep -q "$HOME/.local/bin" || zsh -c "source ~/.zshrc 2>/dev/null && echo \$PATH" 2>/dev/null | grep -q "$HOME/.local/bin"; then
     [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} ~/.local/bin in PATH"
     PASSED_CHECKS=$((PASSED_CHECKS + 1))
 else
@@ -250,8 +254,18 @@ else
         echo "  • $item"
     done
     echo
-    echo "💡 Most issues resolve with: exec zsh"
-    echo "💡 For missing tools, re-run setup scripts"
+    if [[ -n "${SUDO_USER:-}" ]] || [[ "${DURING_SETUP:-}" == "true" ]]; then
+        if [[ $FAILED_CHECKS -ge 5 ]]; then
+            echo "💡 Many tools not detected during initial setup - this is normal!"
+            echo "💡 Environment isn't fully loaded. After user login, most tools should work."
+        else
+            echo "💡 During setup, some tools may not be detected due to environment context"
+        fi
+        echo "💡 To verify properly: log in as user and run './99-verify-core.sh'"
+    else
+        echo "💡 Most issues resolve with: exec zsh"
+        echo "💡 For missing tools, re-run setup scripts"
+    fi
 fi
 
 exit 0

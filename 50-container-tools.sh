@@ -82,6 +82,15 @@ if ! command -v lazydocker >/dev/null || ! lazydocker --version >/dev/null 2>&1;
     # Install to /usr/local/bin
     install lazydocker /usr/local/bin/lazydocker
 
+    # Ensure proper permissions
+    chmod +x /usr/local/bin/lazydocker
+
+    # Verify installation works
+    if ! /usr/local/bin/lazydocker --version >/dev/null 2>&1; then
+        echo "❌ Error: lazydocker installation failed - binary not working"
+        exit 1
+    fi
+
     # Clean up
     cd - >/dev/null
     rm -rf "$TEMP_DIR"

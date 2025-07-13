@@ -133,10 +133,10 @@ echo
 echo "Phase 4: Verification"
 if [[ $EUID -eq 0 ]]; then
     # Run verification but don't let it terminate setup.sh
-    sudo -u "$TARGET_USER" "./99-verify-core.sh" || echo "⚠️  Verification completed with warnings"
+    env DURING_SETUP="true" sudo -u "$TARGET_USER" "./99-verify-core.sh" || echo "⚠️  Verification completed with warnings"
 else
     # Run verification but don't let it terminate setup.sh
-    ./99-verify-core.sh || echo "⚠️  Verification completed with warnings"
+    env DURING_SETUP="true" ./99-verify-core.sh || echo "⚠️  Verification completed with warnings"
 fi
 
 echo
