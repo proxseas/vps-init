@@ -15,15 +15,20 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-# Determine target user (the user who ran sudo)
+# Determine target user (the user who ran sudo OR from setup.sh)
 if [[ -n "${SUDO_USER:-}" ]]; then
     TARGET_USER="$SUDO_USER"
-    TARGET_HOME="/home/$TARGET_USER"
-    TARGET_ZSHRC="$TARGET_HOME/.zshrc"
+elif [[ -n "${TARGET_USER_FROM_SETUP:-}" ]]; then
+    TARGET_USER="$TARGET_USER_FROM_SETUP"
+    echo "Using target user from setup.sh: $TARGET_USER"
 else
-    echo "❌ Error: SUDO_USER not set. Run with sudo, not as root directly." >&2
+    echo "❌ Error: No target user specified." >&2
+    echo "Run with sudo, or ensure TARGET_USER_FROM_SETUP is set when called from setup.sh." >&2
     exit 1
 fi
+
+TARGET_HOME="/home/$TARGET_USER"
+TARGET_ZSHRC="$TARGET_HOME/.zshrc"
 
 echo "Installing language tooling for user: $TARGET_USER"
 

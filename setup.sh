@@ -99,8 +99,18 @@ fi
 
 echo
 echo "Phase 3: Development Tools (requires root)"
-run_script "40-lang-tooling-py-node.sh" "true"
-run_script "50-container-tools.sh" "true"
+
+# Pass target user info to scripts that need it
+if [[ $EUID -eq 0 ]]; then
+    echo "📦 Running 40-lang-tooling-py-node.sh..."
+    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./40-lang-tooling-py-node.sh" && echo "✅ 40-lang-tooling-py-node.sh completed" || echo "❌ 40-lang-tooling-py-node.sh failed"
+
+    echo "📦 Running 50-container-tools.sh..."
+    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./50-container-tools.sh" && echo "✅ 50-container-tools.sh completed" || echo "❌ 50-container-tools.sh failed"
+else
+    run_script "40-lang-tooling-py-node.sh" "true"
+    run_script "50-container-tools.sh" "true"
+fi
 
 echo
 echo "🎉 VPS Setup Complete!"
