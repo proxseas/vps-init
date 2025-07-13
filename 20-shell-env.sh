@@ -80,7 +80,16 @@ EOF
 # ---- 3. FZF ----
 if [ ! -d "$HOME/.fzf" ]; then
   git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
-  yes | "$HOME/.fzf/install" --completion --key-bindings --no-update-rc
+
+  # Install FZF with explicit answers to avoid hanging
+  echo -e "y\ny\ny" | bash "$HOME/.fzf/install" --completion --key-bindings --no-update-rc || {
+    echo "FZF installation failed, continuing..."
+  }
+
+  # Manually add FZF sourcing to ~/.zshrc since we used --no-update-rc
+  if ! grep -q '.fzf.zsh' "$ZSHRC"; then
+    echo '[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh' >> "$ZSHRC"
+  fi
 fi
 
 # ---- 4. Vim + vim-plug ----
@@ -107,7 +116,10 @@ call plug#end()
 
 colorscheme badwolf
 EOF
-  vim +PlugInstall +qall </dev/null
+  # Install vim plugins with timeout to prevent hanging
+  timeout 60 vim +PlugInstall +qall </dev/null || {
+    echo "Vim plugin installation failed or timed out, continuing..."
+  }
 fi
 
 # ---- 5. Make Zsh the default shell ----
