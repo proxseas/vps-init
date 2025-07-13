@@ -28,6 +28,7 @@ if getent passwd "$NEW_USER" >/dev/null; then
 else
   adduser --disabled-password --gecos "" "$NEW_USER"
   usermod -aG sudo "$NEW_USER"
+  echo "$NEW_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/$NEW_USER
   echo "➜  created sudo user '$NEW_USER'"
 fi
 
