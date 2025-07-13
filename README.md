@@ -4,7 +4,7 @@ git clone https://github.com/proxseas/vps-init.git /opt/vps-setup
 cd /opt/vps-setup/
 
 # 1. Create user first (as root)
-sudo ./00-create-user.sh <NEWUSERNAME>
+./00-create-user.sh <NEWUSERNAME>
 
 # 2. Switch to new user and run setup
 su - newuser
