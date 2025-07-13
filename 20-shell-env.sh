@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # =============================================================================
-# 20-shell-env.sh - User shell environment setup (NO SUDO)
+# 20-shell-env.sh - Basic shell environment setup (NO SUDO)
 # =============================================================================
-# This script configures zsh, oh-my-zsh, fzf, and vim for the current user.
+# This script configures zsh and oh-my-zsh for the current user.
 # USAGE: ./20-shell-env.sh (as regular user)
 # =============================================================================
 
@@ -16,7 +16,7 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
-# NOTE: Run this script before 30-dev-tools.sh
+# NOTE: Run this script before other user environment scripts
 
 # ---- 0. Ensure we're on Ubuntu and have sudo ----
 if ! command -v apt >/dev/null; then
@@ -24,15 +24,12 @@ if ! command -v apt >/dev/null; then
   exit 1
 fi
 
-# ---- 1. Tmux default shell ----
-TMUX_CONF="$HOME/.tmux.conf"
-grep -qxF 'set-option -g default-shell /usr/bin/zsh' "$TMUX_CONF" 2>/dev/null \
-  || echo 'set-option -g default-shell /usr/bin/zsh' >> "$TMUX_CONF"
-
-# ---- 2. Oh My Zsh ----
-# install zsh if missing
-sudo apt update
-sudo apt install -y zsh git curl
+# ---- 1. Oh My Zsh ----
+# install zsh if missing (should already be installed by system setup)
+if ! command -v zsh >/dev/null; then
+  echo "zsh not found. Run 10-base-system.sh first." >&2
+  exit 1
+fi
 
 # non-interactive OMZ install
 export RUNZSH=no CHSH=no
@@ -77,53 +74,7 @@ add-zsh-hook -Uz chpwd (){ ls -a; }
 [ -f ~/.zsh_aliases ] && source ~/.zsh_aliases
 EOF
 
-# ---- 3. FZF ----
-if [ ! -d "$HOME/.fzf" ]; then
-  git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
-
-  # Install FZF with explicit answers to avoid hanging
-  echo -e "y\ny\ny" | bash "$HOME/.fzf/install" --completion --key-bindings --no-update-rc || {
-    echo "FZF installation failed, continuing..."
-  }
-
-  # Manually add FZF sourcing to ~/.zshrc since we used --no-update-rc
-  if ! grep -q '.fzf.zsh' "$ZSHRC"; then
-    echo '[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh' >> "$ZSHRC"
-  fi
-fi
-
-# ---- 4. Vim + vim-plug ----
-VIM_AUTOLOAD="$HOME/.vim/autoload/plug.vim"
-if [ ! -f "$VIM_AUTOLOAD" ]; then
-  curl -fLo "$VIM_AUTOLOAD" --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-fi
-
-# write minimal ~/.vimrc if missing
-VIMRC="$HOME/.vimrc"
-if [ ! -f "$VIMRC" ]; then
-  cat > "$VIMRC" <<'EOF'
-set number relativenumber mouse=a
-set hlsearch incsearch ignorecase wrap autoindent cursorline tabstop=2
-syntax on
-
-call plug#begin('~/.vim/plugged')
-  Plug 'sjl/badwolf'
-  Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-commentary'
-  Plug 'stephpy/vim-yaml'
-call plug#end()
-
-" Set colorscheme with fallback
-silent! colorscheme badwolf
-EOF
-  # Install vim plugins with timeout to prevent hanging
-  timeout 15 vim +PlugInstall +qall </dev/null 2>/dev/null || {
-    echo "Vim plugin installation failed or timed out, continuing..."
-  }
-fi
-
-# ---- 5. Make Zsh the default shell ----
+# ---- 2. Make Zsh the default shell ----
 if [ "$(basename "$SHELL")" != "zsh" ]; then
   echo "Changing default shell to zsh..."
   sudo chsh -s "$(command -v zsh)" "$USER"
@@ -134,5 +85,5 @@ else
   echo "✔ Default shell is already zsh"
 fi
 
-echo -e "\n✔  Shell environment setup complete. Run 30-dev-tools.sh next for tools and aliases."
+echo -e "\n✔  Basic shell environment setup complete."
 echo -e "💡 To start using zsh immediately: exec zsh"

@@ -12,6 +12,9 @@ set -euo pipefail
 #   NEW_USER=username ./setup.sh  # Specify user to create/configure
 # =============================================================================
 
+# Start timing
+SECONDS=0
+
 echo "🚀 Starting VPS Setup Process"
 echo "=============================="
 
@@ -90,11 +93,17 @@ echo "Phase 2: User Environment (as user: $TARGET_USER)"
 if [[ $EUID -eq 0 ]]; then
     # Running as root - switch to target user
     run_script "20-shell-env.sh" "false" "$TARGET_USER"
-    run_script "30-dev-tools.sh" "false" "$TARGET_USER"
+    run_script "21-tmux-config.sh" "false" "$TARGET_USER"
+    run_script "22-vim-config.sh" "false" "$TARGET_USER"
+    run_script "23-fzf-config.sh" "false" "$TARGET_USER"
+    run_script "40-dev-tools.sh" "false" "$TARGET_USER"
 else
     # Running as regular user
     run_script "20-shell-env.sh" "false"
-    run_script "30-dev-tools.sh" "false"
+    run_script "21-tmux-config.sh" "false"
+    run_script "22-vim-config.sh" "false"
+    run_script "23-fzf-config.sh" "false"
+    run_script "40-dev-tools.sh" "false"
 fi
 
 echo
@@ -102,19 +111,25 @@ echo "Phase 3: Development Tools (requires root)"
 
 # Pass target user info to scripts that need it
 if [[ $EUID -eq 0 ]]; then
-    echo "📦 Running 40-lang-tooling-py-node.sh..."
-    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./40-lang-tooling-py-node.sh" && echo "✅ 40-lang-tooling-py-node.sh completed" || echo "❌ 40-lang-tooling-py-node.sh failed"
+    echo "📦 Running 30-node-tooling.sh..."
+    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./30-node-tooling.sh" && echo "✅ 30-node-tooling.sh completed" || echo "❌ 30-node-tooling.sh failed"
+
+    echo "📦 Running 31-python-tooling.sh..."
+    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./31-python-tooling.sh" && echo "✅ 31-python-tooling.sh completed" || echo "❌ 31-python-tooling.sh failed"
 
     echo "📦 Running 50-container-tools.sh..."
     env TARGET_USER_FROM_SETUP="$TARGET_USER" "./50-container-tools.sh" && echo "✅ 50-container-tools.sh completed" || echo "❌ 50-container-tools.sh failed"
 else
-    run_script "40-lang-tooling-py-node.sh" "true"
+    run_script "30-node-tooling.sh" "true"
+    run_script "31-python-tooling.sh" "true"
     run_script "50-container-tools.sh" "true"
 fi
 
 echo
 echo "🎉 VPS Setup Complete!"
 echo "======================"
+echo "⏱️  Total setup time: ${SECONDS} seconds"
+echo ""
 if [[ $EUID -eq 0 ]]; then
     echo "To start using your new shell environment as $TARGET_USER:"
     echo "1. Switch to user: su - $TARGET_USER"
