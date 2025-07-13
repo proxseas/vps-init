@@ -47,3 +47,36 @@ else
 fi
 
 echo "✔  user setup complete. You can now:  ssh $NEW_USER@<VPS_IP>"
+
+# Automated flow: switch to user and navigate to setup directory
+echo ""
+echo "🚀 Switching to user '$NEW_USER' and navigating to setup directory..."
+echo "=================================================================================="
+
+# Switch to the new user with a clear welcome message
+exec su - "$NEW_USER" -c "
+cd /opt/vps-init
+
+echo '✅ Successfully switched to user: '$NEW_USER''
+echo '📁 Current directory: '$(pwd)''
+echo ''
+echo '🎯 Next Steps:'
+echo '  1. Run the master setup script (recommended):'
+echo '     ./setup.sh'
+echo ''
+echo '  2. Or run individual scripts step by step:'
+echo '     ./20-shell-env.sh                    # Configure shell environment'
+echo '     ./30-dev-tools.sh                    # Install development tools'
+echo '     sudo ./40-lang-tooling-py-node.sh   # Install Python/Node.js'
+echo '     sudo ./50-container-tools.sh        # Install Docker tools'
+echo ''
+echo '📋 Available scripts:'
+ls -1 *.sh | head -10
+echo ''
+echo '💡 Tip: Start with \"./setup.sh\" for the complete automated setup!'
+echo '=================================================================================='
+echo ''
+
+# Start interactive shell in the setup directory
+exec bash
+"

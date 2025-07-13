@@ -29,13 +29,10 @@ For more control over the process:
 
 ```bash
 # 1. Create user account (as root)
+# This automatically switches to the new user and navigates to /opt/vps-init
 ./00-create-user.sh myusername
 
-# 2. Switch to the new user
-su - myusername
-cd /opt/vps-init
-
-# 3. Run setup as the user
+# 2. You're now the new user in /opt/vps-init - run setup
 ./setup.sh
 ```
 
@@ -89,18 +86,18 @@ ll  # eza-powered directory listing
 If you prefer to run scripts individually:
 
 ```bash
-# 1. As root - create user and system setup
+# 1. Create user (as root) - automatically switches to user
 sudo ./00-create-user.sh myusername
-sudo ./10-base-system.sh
+# You're now user 'myusername' in /opt/vps-init
 
-# 2. Switch to user - configure environment
-su - myusername
-cd /opt/vps-init
+# 2. Configure user environment
 ./20-shell-env.sh
 ./30-dev-tools.sh
 
-# 3. Back to root - install development tools
+# 3. Switch back to root for system tools
 exit  # back to root
+cd /opt/vps-init
+sudo ./10-base-system.sh
 sudo ./40-lang-tooling-py-node.sh
 sudo ./50-container-tools.sh
 ```
