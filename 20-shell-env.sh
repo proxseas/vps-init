@@ -114,10 +114,11 @@ call plug#begin('~/.vim/plugged')
   Plug 'stephpy/vim-yaml'
 call plug#end()
 
-colorscheme badwolf
+" Set colorscheme with fallback
+silent! colorscheme badwolf
 EOF
   # Install vim plugins with timeout to prevent hanging
-  timeout 60 vim +PlugInstall +qall </dev/null || {
+  timeout 15 vim +PlugInstall +qall </dev/null 2>/dev/null || {
     echo "Vim plugin installation failed or timed out, continuing..."
   }
 fi
