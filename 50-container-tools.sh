@@ -54,11 +54,19 @@ if ! command -v docker >/dev/null; then
 
     apt-get update
     apt-get install -y docker-ce docker-ce-cli containerd.io
-    usermod -aG docker "$TARGET_USER"
-
-    echo "✔ Docker installed and $TARGET_USER added to docker group"
+    echo "✔ Docker CE installed."
 else
     echo "✔ Docker already installed"
+fi
+
+# Always ensure the target user is in the docker group
+if ! groups "$TARGET_USER" | grep -q '\bdocker\b'; then
+    echo "Adding user '$TARGET_USER' to the 'docker' group..."
+    usermod -aG docker "$TARGET_USER"
+    echo "✔ User added to docker group."
+    echo "IMPORTANT: You must log out and log back in for Docker permissions to apply."
+else
+    echo "✔ User '$TARGET_USER' is already in the 'docker' group."
 fi
 
 ##############################################################################
