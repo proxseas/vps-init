@@ -52,18 +52,7 @@ else
     echo "✔ zoxide already installed"
 fi
 
-##############################################################################
-# Install glow via snap
-##############################################################################
-print_section "Installing glow"
 
-if ! command -v glow >/dev/null 2>&1; then
-    echo "Installing glow..."
-    snap install glow
-    echo "✔ glow installed"
-else
-    echo "✔ glow already installed"
-fi
 
 ##############################################################################
 # Add useful aliases
@@ -84,12 +73,10 @@ echo "✔ Aliases configured"
 echo -e "\n✔ Binary tools setup complete!"
 echo "Available tools:"
 echo "  - zoxide: Smart cd replacement (z, zi commands)"
-echo "  - glow: Terminal markdown reader"
 echo ""
 echo "Usage:"
 echo "  - z <directory>: Smart directory navigation"
 echo "  - zi: Interactive directory selection"
-echo "  - glow README.md: View markdown files"
 echo ""
 echo "💡 Restart your terminal or run 'source ~/.zshrc' to use new tools"
 echo ""

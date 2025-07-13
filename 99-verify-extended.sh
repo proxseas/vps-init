@@ -80,6 +80,7 @@ print_section "Extended Python CLI Tools"
 check_command "pipx" "pipx --version" "pipx Python CLI installer" true
 check_command "glances" "glances --version" "glances system monitor" true
 check_command "http" "http --version" "httpie HTTP client" true
+check_command "glow" "glow --version" "glow markdown reader" true
 
 ##############################################################################
 # Extended Aliases and PATH
@@ -141,8 +142,10 @@ if [[ $FAILED_CHECKS -eq 0 ]]; then
     echo "💡 Extended tools available:"
     echo "  - Rust tools: fd, delta, procs, tokei"
     echo "  - Python tools: pipx, glances, httpie"
+    echo "  - Markdown: glow"
     echo "  - Try: fd <pattern>, procs, tokei, glances"
     echo "  - HTTP: http GET api.github.com"
+    echo "  - Read: glow README.md"
     echo "  - Git diff now uses delta automatically"
     exit 0
 else

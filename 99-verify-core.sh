@@ -197,7 +197,6 @@ check_command "lazydocker" "lazydocker --version" "lazydocker TUI" true
 print_section "Core Binary Tools"
 
 check_command "zoxide" "zoxide --version" "zoxide smart cd"
-check_command "glow" "glow --version" "glow markdown reader"
 
 ##############################################################################
 # Core Aliases and PATH
@@ -249,7 +248,6 @@ if [[ $FAILED_CHECKS -eq 0 ]]; then
     echo
     echo "💡 Quick start:"
     echo "  - Try: ll, z <directory>"
-    echo "  - Read: glow README.md"
     echo "  - Docker: lzd (lazydocker)"
     echo "  - Search: rg <pattern>"
     echo "  - View: bat <file>"
