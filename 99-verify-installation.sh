@@ -127,16 +127,23 @@ check_command "wget" "wget --version" "Wget downloader"
 check_command "htop" "" "htop process monitor"
 check_command "tmux" "tmux -V" "tmux terminal multiplexer"
 check_command "vim" "vim --version" "Vim text editor"
-check_command "rg" "rg --version" "ripgrep search tool"
 check_command "jq" "jq --version" "jq JSON processor"
-check_command "bat" "bat --version" "bat syntax highlighter"
-check_command "fd" "fd --version" "fd file finder"
 check_command "tldr" "tldr --version" "tldr help pages"
 check_command "tig" "tig --version" "tig Git interface"
 check_command "tree" "tree --version" "tree directory listing"
 check_command "watch" "watch --version" "watch command repeater"
 check_command "entr" "entr -h" "entr file watcher"
+
+##############################################################################
+# Rust CLI Tools
+##############################################################################
+print_section "Rust CLI Tools"
+
+check_command "rg" "rg --version" "ripgrep search tool"
+check_command "bat" "bat --version" "bat syntax highlighter"
+check_command "fd" "fd --version" "fd file finder"
 check_command "delta" "delta --version" "git-delta diff viewer"
+check_command "procs" "procs --version" "procs process viewer"
 
 ##############################################################################
 # Shell Environment
@@ -182,7 +189,6 @@ check_command "lazydocker" "lazydocker --version" "lazydocker TUI" true
 # Python CLI tools
 check_command "pipx" "pipx --version" "pipx Python CLI installer" true
 check_command "glances" "glances --version" "glances system monitor" true
-check_command "procs" "procs --version" "procs process viewer" true
 
 ##############################################################################
 # Binary Tools

@@ -123,6 +123,9 @@ if [[ $EUID -eq 0 ]]; then
     echo "📦 Running 41-binary-tools.sh..."
     env TARGET_USER_FROM_SETUP="$TARGET_USER" "./41-binary-tools.sh" && echo "✅ 41-binary-tools.sh completed" || echo "❌ 41-binary-tools.sh failed"
 
+    echo "📦 Running 42-rust-tools.sh..."
+    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./42-rust-tools.sh" && echo "✅ 42-rust-tools.sh completed" || echo "❌ 42-rust-tools.sh failed"
+
     echo "📦 Running 50-container-tools.sh..."
     env TARGET_USER_FROM_SETUP="$TARGET_USER" "./50-container-tools.sh" && echo "✅ 50-container-tools.sh completed" || echo "❌ 50-container-tools.sh failed"
 else
@@ -130,6 +133,7 @@ else
     run_script "31-python-tooling.sh" "true"
     run_script "32-python-cli-tools.sh" "true"
     run_script "41-binary-tools.sh" "true"
+    run_script "42-rust-tools.sh" "true"
     run_script "50-container-tools.sh" "true"
 fi
 

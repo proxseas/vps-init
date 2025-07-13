@@ -4,7 +4,7 @@ set -euo pipefail
 # =============================================================================
 # 32-python-cli-tools.sh - Python CLI tools installation (REQUIRES SUDO)
 # =============================================================================
-# This script installs pipx and Python CLI tools like glances and procs.
+# This script installs pipx and Python CLI tools like glances.
 # USAGE: sudo ./32-python-cli-tools.sh
 # =============================================================================
 
@@ -58,24 +58,13 @@ else
     echo "✔ glances already installed"
 fi
 
-# Install procs (modern ps replacement)
-if ! sudo -u "$TARGET_USER" pipx list | grep -q "procs"; then
-    echo "Installing procs..."
-    sudo -u "$TARGET_USER" pipx install procs
-    echo "✔ procs installed"
-else
-    echo "✔ procs already installed"
-fi
-
 echo -e "\n✔ Python CLI tools setup complete!"
 echo "Available tools:"
 echo "  - pipx: Python CLI tool installer"
 echo "  - glances: System monitoring tool"
-echo "  - procs: Modern ps replacement"
 echo ""
 echo "Usage:"
 echo "  - glances: System monitoring dashboard"
-echo "  - procs: Better process listing"
 echo "  - pipx install <tool>: Install Python CLI tools"
 echo ""
 echo "💡 Tools are installed in ~/.local/bin and should be in your PATH"
