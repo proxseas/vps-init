@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# =============================================================================
+# 20-shell-env.sh - User shell environment setup (NO SUDO)
+# =============================================================================
+# This script configures zsh, oh-my-zsh, fzf, and vim for the current user.
+# USAGE: ./20-shell-env.sh (as regular user)
+# =============================================================================
+
+# Check if running with sudo (should NOT be)
+if [[ $EUID -eq 0 ]]; then
+    echo "❌ Error: This script should NOT be run with sudo" >&2
+    echo "Usage: ./20-shell-env.sh (as regular user)" >&2
+    echo "This script configures the current user's shell environment." >&2
+    exit 1
+fi
+
 # NOTE: Run this script before 30-dev-tools.sh
 
 # ---- 0. Ensure we're on Ubuntu and have sudo ----

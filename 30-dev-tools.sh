@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# =============================================================================
+# 30-dev-tools.sh - User development tools setup (NO SUDO)
+# =============================================================================
+# This script installs eza, just, and sets up user aliases.
+# USAGE: ./30-dev-tools.sh (as regular user)
+# =============================================================================
+
+# Check if running with sudo (should NOT be)
+if [[ $EUID -eq 0 ]]; then
+    echo "❌ Error: This script should NOT be run with sudo" >&2
+    echo "Usage: ./30-dev-tools.sh (as regular user)" >&2
+    echo "This script installs tools and configures aliases for the current user." >&2
+    exit 1
+fi
+
 # NOTE: This script depends on 20-shell-env.sh being run first
 
 # Check if zsh is installed (from previous script)
