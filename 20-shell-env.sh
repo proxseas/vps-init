@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# NOTE: Run this script before 30-dev-tools.sh
+
 # ---- 0. Ensure we're on Ubuntu and have sudo ----
 if ! command -v apt >/dev/null; then
   echo "This script is for Debian/Ubuntu." >&2
@@ -93,32 +95,10 @@ EOF
   vim +PlugInstall +qall </dev/null
 fi
 
-# ---- 5. Aliases & functions ----
-cat > "$HOME/.zsh_aliases" <<'EOF'
-# General
-alias ll='ls -lah --group-directories-first'
-alias ..='cd ..'
-alias q='exit'
-alias reloadzsh='source ~/.zshrc'
-alias editzsh='vim ~/.zshrc'
-
-# Python venv
-alias mkvenv='python3 -m venv .venv'
-alias actvenv='source .venv/bin/activate'
-alias takevenv='mkvenv && actvenv && echo "Activated new venv"'
-
-# Tmux
-alias tl='tmux ls'
-alias ta='tmux attach'
-
-# Docker helper
-alias lzd='lazydocker'
-EOF
-
-# ---- 6. Make Zsh the default shell ----
+# ---- 5. Make Zsh the default shell ----
 if [ "$(basename "$SHELL")" != "zsh" ]; then
   sudo chsh -s "$(command -v zsh)" "$USER"
   echo 'source ~/.zshrc' >> "$HOME/.zprofile"
 fi
 
-echo -e "\n✔  Shell environment setup complete. Restart your terminal or run 'exec zsh'."
+echo -e "\n✔  Shell environment setup complete. Run 30-dev-tools.sh next for tools and aliases."
