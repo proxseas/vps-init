@@ -112,8 +112,14 @@ fi
 
 # ---- 5. Make Zsh the default shell ----
 if [ "$(basename "$SHELL")" != "zsh" ]; then
+  echo "Changing default shell to zsh..."
   sudo chsh -s "$(command -v zsh)" "$USER"
   echo 'source ~/.zshrc' >> "$HOME/.zprofile"
+  echo "✔ Default shell changed to zsh"
+  echo "⚠️  NOTE: Current session is still bash. To switch immediately, run: exec zsh"
+else
+  echo "✔ Default shell is already zsh"
 fi
 
 echo -e "\n✔  Shell environment setup complete. Run 30-dev-tools.sh next for tools and aliases."
+echo -e "💡 To start using zsh immediately: exec zsh"

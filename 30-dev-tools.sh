@@ -82,3 +82,7 @@ alias lzd='lazydocker'
 EOF
 
 echo "✔  Dev-tools & aliases created in $ZSH_ALIASES"
+echo -e "\n🎉 Setup complete! To start using your new environment:"
+echo "1. Switch to zsh: exec zsh"
+echo "2. Or restart your terminal"
+echo "3. Your aliases will be loaded automatically"
