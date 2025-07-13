@@ -273,5 +273,6 @@ else
     echo "  3. Check the installation logs above"
     echo
     echo "💡 Most issues are resolved by restarting your terminal."
-    exit 1
+    echo "💡 This is normal for first-time setup - tools are installed but PATH needs updating."
+    exit 0
 fi

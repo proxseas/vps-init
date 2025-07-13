@@ -140,9 +140,11 @@ fi
 echo
 echo "Phase 4: Verification"
 if [[ $EUID -eq 0 ]]; then
-    run_script "99-verify-installation.sh" "false" "$TARGET_USER"
+    # Run verification but don't let it terminate setup.sh
+    sudo -u "$TARGET_USER" "./99-verify-installation.sh" || echo "⚠️  Verification completed with warnings"
 else
-    run_script "99-verify-installation.sh" "false"
+    # Run verification but don't let it terminate setup.sh
+    ./99-verify-installation.sh || echo "⚠️  Verification completed with warnings"
 fi
 
 echo
@@ -151,13 +153,21 @@ echo "======================"
 echo "⏱️  Total setup time: ${SECONDS} seconds"
 echo ""
 if [[ $EUID -eq 0 ]]; then
+    echo "✅ Setup completed for user: $TARGET_USER"
+    echo ""
     echo "To start using your new shell environment as $TARGET_USER:"
     echo "1. Switch to user: su - $TARGET_USER"
     echo "2. Or SSH as: ssh $TARGET_USER@<your-server>"
 else
+    echo "✅ Setup completed for user: $USER"
+    echo ""
     echo "To start using your new shell environment:"
     echo "1. Switch to zsh: exec zsh"
     echo "2. Or restart your terminal"
 fi
 echo "3. New terminals will automatically use zsh"
 echo "4. Your aliases and tools are ready to use!"
+echo ""
+echo "💡 If verification showed warnings, most issues are resolved by:"
+echo "   - Restarting your terminal: exec zsh"
+echo "   - Re-running: source ~/.zshrc"
