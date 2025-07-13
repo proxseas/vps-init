@@ -44,7 +44,11 @@ apt install -y \
 sudo -u "$TARGET_USER" bash -c 'curl -Ls https://astral.sh/uv/install.sh | bash'
 
 # Ensure uv is on PATH (the installer drops it into ~/.local/bin)
-sudo -u "$TARGET_USER" bash -c "grep -q 'uv install path' \"$TARGET_ZSHRC\" 2>/dev/null || echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"  # uv install path' >> \"$TARGET_ZSHRC\""
+sudo -u "$TARGET_USER" bash <<EOF
+if ! grep -q 'uv install path' "$TARGET_ZSHRC" 2>/dev/null; then
+  echo 'export PATH="\$HOME/.local/bin:\$PATH"  # uv install path' >> "$TARGET_ZSHRC"
+fi
+EOF
 
 echo "✔  uv installed."
 
@@ -62,19 +66,19 @@ echo "✔  fnm installed."
 # 3.  Optional: first-time tool versions
 ##############################################################################
 # Fast latest LTS Node and corepack front-end (pnpm, yarn):
-# Set up PATH manually to avoid sourcing .zshrc from bash
-sudo -u "$TARGET_USER" bash -c "
-  export PATH=\"$TARGET_HOME/.local/share/fnm:\$PATH\"
+# Use here-document to avoid complex escaping
+sudo -u "$TARGET_USER" bash <<EOF
+export PATH="$TARGET_HOME/.local/share/fnm:\$PATH"
 
-  # Check if fnm binary exists
-  if [ -f \"$TARGET_HOME/.local/share/fnm/fnm\" ]; then
-    eval \"\$(\"$TARGET_HOME/.local/share/fnm/fnm\" env --use-on-cd)\"
-    fnm install --lts || echo 'fnm install failed, continuing...'
-    corepack enable || echo 'corepack enable failed, continuing...'
-  else
-    echo 'fnm binary not found, skipping Node.js installation'
-  fi
-"
+# Check if fnm binary exists
+if [[ -x "$TARGET_HOME/.local/share/fnm/fnm" ]]; then
+  eval "\$($TARGET_HOME/.local/share/fnm/fnm env --use-on-cd)"
+  fnm install --lts || echo 'fnm install failed, continuing...'
+  corepack enable || echo 'corepack enable failed, continuing...'
+else
+  echo 'fnm binary not found, skipping Node.js installation'
+fi
+EOF
 
 # Example: create an isolated project with uv + Node:
 #   mkdir demo && cd demo
