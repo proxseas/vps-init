@@ -117,23 +117,15 @@ if [[ $EUID -eq 0 ]]; then
     echo "📦 Running 31-python-tooling.sh..."
     env TARGET_USER_FROM_SETUP="$TARGET_USER" "./31-python-tooling.sh" && echo "✅ 31-python-tooling.sh completed" || echo "❌ 31-python-tooling.sh failed"
 
-    echo "📦 Running 32-python-cli-tools.sh..."
-    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./32-python-cli-tools.sh" && echo "✅ 32-python-cli-tools.sh completed" || echo "❌ 32-python-cli-tools.sh failed"
-
     echo "📦 Running 41-binary-tools.sh..."
     env TARGET_USER_FROM_SETUP="$TARGET_USER" "./41-binary-tools.sh" && echo "✅ 41-binary-tools.sh completed" || echo "❌ 41-binary-tools.sh failed"
-
-    echo "📦 Running 42-rust-tools.sh..."
-    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./42-rust-tools.sh" && echo "✅ 42-rust-tools.sh completed" || echo "❌ 42-rust-tools.sh failed"
 
     echo "📦 Running 50-container-tools.sh..."
     env TARGET_USER_FROM_SETUP="$TARGET_USER" "./50-container-tools.sh" && echo "✅ 50-container-tools.sh completed" || echo "❌ 50-container-tools.sh failed"
 else
     run_script "30-node-tooling.sh" "true"
     run_script "31-python-tooling.sh" "true"
-    run_script "32-python-cli-tools.sh" "true"
     run_script "41-binary-tools.sh" "true"
-    run_script "42-rust-tools.sh" "true"
     run_script "50-container-tools.sh" "true"
 fi
 
@@ -141,10 +133,10 @@ echo
 echo "Phase 4: Verification"
 if [[ $EUID -eq 0 ]]; then
     # Run verification but don't let it terminate setup.sh
-    sudo -u "$TARGET_USER" "./99-verify-installation.sh" || echo "⚠️  Verification completed with warnings"
+    sudo -u "$TARGET_USER" "./99-verify-core.sh" || echo "⚠️  Verification completed with warnings"
 else
     # Run verification but don't let it terminate setup.sh
-    ./99-verify-installation.sh || echo "⚠️  Verification completed with warnings"
+    ./99-verify-core.sh || echo "⚠️  Verification completed with warnings"
 fi
 
 echo
@@ -171,3 +163,15 @@ echo ""
 echo "💡 If verification showed warnings, most issues are resolved by:"
 echo "   - Restarting your terminal: exec zsh"
 echo "   - Re-running: source ~/.zshrc"
+echo ""
+echo "🚀 Extended Tools Available (Optional):"
+echo "========================================"
+echo "The following scripts install additional tools that are slower to install:"
+echo "• sudo ./32-python-tools-extended.sh    # httpie, glances + pipx"
+echo "• sudo ./42-rust-tools-extended.sh      # fd, git-delta, procs, tokei + rust toolchain"
+echo ""
+echo "🔐 Security Hardening Available:"
+echo "• sudo ./15-configure-ssh-security.sh   # Disable password auth, harden SSH"
+echo ""
+echo "📋 To verify extended tools after installation:"
+echo "• ./99-verify-extended.sh                # Verify optional tools"

@@ -2,10 +2,10 @@
 set -euo pipefail
 
 # =============================================================================
-# 99-verify-installation.sh - Comprehensive installation verification (NO SUDO)
+# 99-verify-core.sh - Core installation verification (NO SUDO)
 # =============================================================================
-# This script verifies that all tools and components are properly installed.
-# USAGE: ./99-verify-installation.sh (as regular user)
+# This script verifies that all core tools and components are properly installed.
+# USAGE: ./99-verify-core.sh (as regular user)
 # =============================================================================
 
 # Source utilities
@@ -103,8 +103,8 @@ check_service() {
     fi
 }
 
-echo "🔍 VPS Setup Verification"
-echo "========================="
+echo "🔍 VPS Core Setup Verification"
+echo "=============================="
 echo
 
 ##############################################################################
@@ -135,15 +135,20 @@ check_command "watch" "watch --version" "watch command repeater"
 check_command "entr" "entr -h" "entr file watcher"
 
 ##############################################################################
-# Rust CLI Tools
+# Core CLI Tools
 ##############################################################################
-print_section "Rust CLI Tools"
+print_section "Core CLI Tools"
 
 check_command "rg" "rg --version" "ripgrep search tool"
-check_command "bat" "bat --version" "bat syntax highlighter"
-check_command "fd" "fd --version" "fd file finder"
-check_command "delta" "delta --version" "git-delta diff viewer"
-check_command "procs" "procs --version" "procs process viewer"
+if command -v batcat >/dev/null 2>&1; then
+    check_command "batcat" "batcat --version" "bat syntax highlighter"
+elif command -v bat >/dev/null 2>&1; then
+    check_command "bat" "bat --version" "bat syntax highlighter"
+else
+    TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
+    echo -e "${RED}✗${NC} bat syntax highlighter (command not found)"
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
+fi
 
 ##############################################################################
 # Shell Environment
@@ -169,9 +174,9 @@ check_command "eza" "eza --version" "eza file listing"
 check_command "just" "just --version" "just task runner"
 
 ##############################################################################
-# Language Tooling (Comprehensive Checks)
+# Language Tooling
 ##############################################################################
-print_section "Language Tooling (Comprehensive)"
+print_section "Language Tooling"
 
 # Python tooling
 check_command "uv" "uv --version" "uv Python package manager" true
@@ -186,26 +191,18 @@ check_command "npm" "npm --version" "npm package manager" true
 check_command "docker" "docker --version" "Docker container runtime" true
 check_command "lazydocker" "lazydocker --version" "lazydocker TUI" true
 
-# Python CLI tools
-check_command "pipx" "pipx --version" "pipx Python CLI installer" true
-check_command "glances" "glances --version" "glances system monitor" true
-
 ##############################################################################
-# Binary Tools
+# Core Binary Tools
 ##############################################################################
-print_section "Binary Tools"
+print_section "Core Binary Tools"
 
 check_command "zoxide" "zoxide --version" "zoxide smart cd"
-check_command "http" "http --version" "httpie HTTP client"
-check_command "tokei" "tokei --version" "tokei code statistics"
 check_command "glow" "glow --version" "glow markdown reader"
-check_command "rustc" "rustc --version" "Rust compiler"
-check_command "cargo" "cargo --version" "Rust package manager"
 
 ##############################################################################
-# Aliases and PATH
+# Core Aliases and PATH
 ##############################################################################
-print_section "Aliases and PATH"
+print_section "Core Aliases and PATH"
 
 # Check if aliases work
 TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
@@ -236,35 +233,30 @@ else
     FAILED_CHECKS=$((FAILED_CHECKS + 1))
 fi
 
-TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-if echo "$PATH" | grep -q "$HOME/.cargo/bin"; then
-    echo -e "${GREEN}✓${NC} ~/.cargo/bin in PATH"
-    PASSED_CHECKS=$((PASSED_CHECKS + 1))
-else
-    echo -e "${YELLOW}⚠${NC} ~/.cargo/bin not in PATH (may need terminal restart)"
-    FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
 ##############################################################################
 # Summary
 ##############################################################################
 echo
-echo "📊 Verification Summary"
-echo "======================"
+echo "📊 Core Verification Summary"
+echo "============================"
 echo -e "Total checks: $TOTAL_CHECKS"
 echo -e "${GREEN}Passed: $PASSED_CHECKS${NC}"
 echo -e "${RED}Failed: $FAILED_CHECKS${NC}"
 echo
 
 if [[ $FAILED_CHECKS -eq 0 ]]; then
-    echo -e "${GREEN}🎉 All checks passed! Your VPS setup is complete.${NC}"
+    echo -e "${GREEN}🎉 All core checks passed! Your VPS setup is complete.${NC}"
     echo
     echo "💡 Quick start:"
-    echo "  - Try: ll, z <directory>, http GET api.github.com"
-    echo "  - Monitor: glances, procs"
+    echo "  - Try: ll, z <directory>"
     echo "  - Read: glow README.md"
-    echo "  - Code stats: tokei"
     echo "  - Docker: lzd (lazydocker)"
+    echo "  - Search: rg <pattern>"
+    echo "  - View: bat <file>"
+    echo
+    echo "🚀 To install extended tools:"
+    echo "  - sudo ./32-python-tools-extended.sh"
+    echo "  - sudo ./42-rust-tools-extended.sh"
     exit 0
 else
     echo -e "${YELLOW}⚠️  Some checks failed. You may need to:${NC}"

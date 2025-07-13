@@ -4,7 +4,7 @@ set -euo pipefail
 # =============================================================================
 # 41-binary-tools.sh - Binary tools installation (REQUIRES SUDO)
 # =============================================================================
-# This script installs various binary tools: zoxide, httpie, tokei, and glow.
+# This script installs core binary tools: zoxide and glow.
 # USAGE: sudo ./41-binary-tools.sh
 # =============================================================================
 
@@ -32,32 +32,6 @@ TARGET_ZSHRC="$TARGET_HOME/.zshrc"
 echo "Installing binary tools for user: $TARGET_USER"
 
 ##############################################################################
-# Install Rust toolchain (needed for tokei)
-##############################################################################
-print_section "Installing Rust toolchain"
-
-# Install Rust system packages
-apt update
-apt install -y rustc cargo
-
-# Install Rust via rustup for the target user (more up-to-date)
-if ! sudo -u "$TARGET_USER" command -v rustup >/dev/null 2>&1; then
-    echo "Installing rustup for user $TARGET_USER..."
-    sudo -u "$TARGET_USER" bash -c 'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y'
-
-    # Add cargo/bin to PATH in .zshrc
-    sudo -u "$TARGET_USER" bash <<EOF
-if ! grep -q 'cargo/bin' "$TARGET_ZSHRC" 2>/dev/null; then
-    echo 'export PATH="\$HOME/.cargo/bin:\$PATH"  # Rust cargo path' >> "$TARGET_ZSHRC"
-fi
-EOF
-
-    echo "✔ Rust toolchain installed"
-else
-    echo "✔ Rust toolchain already installed"
-fi
-
-##############################################################################
 # Install zoxide (smart cd replacement)
 ##############################################################################
 print_section "Installing zoxide"
@@ -76,33 +50,6 @@ EOF
     echo "✔ zoxide installed"
 else
     echo "✔ zoxide already installed"
-fi
-
-##############################################################################
-# Install httpie via pipx
-##############################################################################
-print_section "Installing httpie"
-
-if ! sudo -u "$TARGET_USER" pipx list | grep -q "httpie"; then
-    echo "Installing httpie..."
-    sudo -u "$TARGET_USER" pipx install httpie
-    echo "✔ httpie installed"
-else
-    echo "✔ httpie already installed"
-fi
-
-##############################################################################
-# Install tokei via cargo
-##############################################################################
-print_section "Installing tokei"
-
-# Use cargo to install tokei
-if ! sudo -u "$TARGET_USER" command -v tokei >/dev/null 2>&1; then
-    echo "Installing tokei..."
-    sudo -u "$TARGET_USER" bash -c 'source ~/.cargo/env && cargo install tokei'
-    echo "✔ tokei installed"
-else
-    echo "✔ tokei already installed"
 fi
 
 ##############################################################################
@@ -132,24 +79,20 @@ source "$(dirname "$0")/utils.sh"
 update_alias "cd" "z" "$ZSH_ALIASES"
 update_alias "cdi" "zi" "$ZSH_ALIASES"  # interactive cd
 
-# httpie aliases
-update_alias "http" "http" "$ZSH_ALIASES"
-update_alias "https" "https" "$ZSH_ALIASES"
-
 echo "✔ Aliases configured"
 
 echo -e "\n✔ Binary tools setup complete!"
 echo "Available tools:"
 echo "  - zoxide: Smart cd replacement (z, zi commands)"
-echo "  - httpie: Modern HTTP client (http, https commands)"
-echo "  - tokei: Code statistics tool"
 echo "  - glow: Terminal markdown reader"
 echo ""
 echo "Usage:"
 echo "  - z <directory>: Smart directory navigation"
 echo "  - zi: Interactive directory selection"
-echo "  - http GET api.github.com: Make HTTP requests"
-echo "  - tokei: Show code statistics"
 echo "  - glow README.md: View markdown files"
 echo ""
 echo "💡 Restart your terminal or run 'source ~/.zshrc' to use new tools"
+echo ""
+echo "🚀 Extended Tools Available:"
+echo "  - For advanced Rust CLI tools: sudo ./42-rust-tools-extended.sh"
+echo "  - For Python CLI tools: sudo ./32-python-tools-extended.sh"

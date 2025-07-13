@@ -2,10 +2,11 @@
 set -euo pipefail
 
 # =============================================================================
-# 32-python-cli-tools.sh - Python CLI tools installation (REQUIRES SUDO)
+# 32-python-tools-extended.sh - Extended Python CLI tools installation (REQUIRES SUDO)
 # =============================================================================
-# This script installs pipx and Python CLI tools like glances.
-# USAGE: sudo ./32-python-cli-tools.sh
+# This script installs pipx and extended Python CLI tools like glances and httpie.
+# This is an OPTIONAL script - run manually if you want these tools.
+# USAGE: sudo ./32-python-tools-extended.sh
 # =============================================================================
 
 # Source utilities
@@ -28,7 +29,7 @@ fi
 
 TARGET_HOME="/home/$TARGET_USER"
 
-echo "Installing Python CLI tools for user: $TARGET_USER"
+echo "Installing extended Python CLI tools for user: $TARGET_USER"
 
 ##############################################################################
 # Install pipx for Python CLI tools
@@ -49,7 +50,7 @@ echo "✔ pipx installed and configured"
 ##############################################################################
 print_section "Installing Python CLI tools"
 
-# Install glances (basic monitoring tool)
+# Install glances (system monitoring tool)
 if ! sudo -u "$TARGET_USER" pipx list | grep -q "glances"; then
     echo "Installing glances..."
     sudo -u "$TARGET_USER" pipx install glances
@@ -58,13 +59,38 @@ else
     echo "✔ glances already installed"
 fi
 
-echo -e "\n✔ Python CLI tools setup complete!"
+# Install httpie (modern HTTP client)
+if ! sudo -u "$TARGET_USER" pipx list | grep -q "httpie"; then
+    echo "Installing httpie..."
+    sudo -u "$TARGET_USER" pipx install httpie
+    echo "✔ httpie installed"
+else
+    echo "✔ httpie already installed"
+fi
+
+##############################################################################
+# Set up aliases
+##############################################################################
+print_section "Setting up aliases"
+
+ZSH_ALIASES="$TARGET_HOME/.zsh_aliases"
+
+# httpie aliases
+update_alias "http" "http" "$ZSH_ALIASES"
+update_alias "https" "https" "$ZSH_ALIASES"
+
+echo "✔ Aliases configured"
+
+echo -e "\n✔ Extended Python CLI tools setup complete!"
 echo "Available tools:"
 echo "  - pipx: Python CLI tool installer"
 echo "  - glances: System monitoring tool"
+echo "  - httpie: Modern HTTP client"
 echo ""
 echo "Usage:"
 echo "  - glances: System monitoring dashboard"
-echo "  - pipx install <tool>: Install Python CLI tools"
+echo "  - http GET api.github.com: Make HTTP requests"
+echo "  - https GET api.github.com: Make HTTPS requests"
+echo "  - pipx install <tool>: Install additional Python CLI tools"
 echo ""
 echo "💡 Tools are installed in ~/.local/bin and should be in your PATH"

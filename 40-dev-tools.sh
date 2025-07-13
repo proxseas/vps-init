@@ -4,7 +4,7 @@ set -euo pipefail
 # =============================================================================
 # 40-dev-tools.sh - Development tools and aliases setup (NO SUDO)
 # =============================================================================
-# This script installs eza, just, and sets up useful aliases.
+# This script installs eza, just, ripgrep, bat, and sets up useful aliases.
 # USAGE: ./40-dev-tools.sh (as regular user)
 # =============================================================================
 
@@ -48,12 +48,34 @@ else
   echo "✔ eza already installed"
 fi
 
-# 2) just (task runner)
+# 2) just (task runner) - direct binary download
 if ! command -v just >/dev/null; then
-  sudo snap install just --classic
+  echo "Installing just..."
+  curl -sL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | \
+    sudo tar xz -C /usr/local/bin just
   echo "✔ just installed"
 else
   echo "✔ just already installed"
+fi
+
+# 3) ripgrep (via apt)
+if ! command -v rg >/dev/null; then
+  echo "Installing ripgrep..."
+  sudo apt update
+  sudo apt install -y ripgrep
+  echo "✔ ripgrep installed"
+else
+  echo "✔ ripgrep already installed"
+fi
+
+# 4) bat (via apt)
+if ! command -v bat >/dev/null && ! command -v batcat >/dev/null; then
+  echo "Installing bat..."
+  sudo apt update
+  sudo apt install -y bat
+  echo "✔ bat installed"
+else
+  echo "✔ bat already installed"
 fi
 
 ##############################################################################
@@ -73,6 +95,11 @@ update_alias "ls" "eza" "$ZSH_ALIASES"
 update_alias "ll" "eza -l --git" "$ZSH_ALIASES"
 update_alias "la" "eza -la --git" "$ZSH_ALIASES"
 
+# bat alias (Ubuntu apt version is called 'batcat')
+if command -v batcat >/dev/null; then
+  update_alias "bat" "batcat" "$ZSH_ALIASES"
+fi
+
 # Python venv (uv)
 update_alias "mkvenv" "uv venv .venv" "$ZSH_ALIASES"
 update_alias "actvenv" "source .venv/bin/activate" "$ZSH_ALIASES"
@@ -91,10 +118,12 @@ echo -e "\n🎉 Development tools setup complete!"
 echo "Available tools:"
 echo "  - eza: Modern ls replacement"
 echo "  - just: Task runner"
-echo "  - bat: Modern cat with syntax highlighting (installed by system setup)"
+echo "  - ripgrep (rg): Fast grep replacement"
+echo "  - bat: Modern cat with syntax highlighting"
 echo ""
 echo "Available aliases:"
 echo "  - ls, ll, la: Directory listing with eza"
+echo "  - bat: Cat with syntax highlighting"
 echo "  - q: Quick exit"
 echo "  - tl, ta: Tmux shortcuts"
 echo "  - mkvenv, actvenv, takevenv: Python virtual env helpers"

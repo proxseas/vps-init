@@ -2,10 +2,11 @@
 set -euo pipefail
 
 # =============================================================================
-# 42-rust-tools.sh - Rust tools installation via cargo (REQUIRES SUDO)
+# 42-rust-tools-extended.sh - Extended Rust tools installation via cargo (REQUIRES SUDO)
 # =============================================================================
-# This script installs Rust CLI tools via cargo for latest versions.
-# USAGE: sudo ./42-rust-tools.sh
+# This script installs Rust toolchain and extended Rust CLI tools via cargo.
+# This is an OPTIONAL script - run manually if you want these tools.
+# USAGE: sudo ./42-rust-tools-extended.sh
 # =============================================================================
 
 # Source utilities
@@ -27,13 +28,40 @@ else
 fi
 
 TARGET_HOME="/home/$TARGET_USER"
+TARGET_ZSHRC="$TARGET_HOME/.zshrc"
 
-echo "Installing Rust CLI tools for user: $TARGET_USER"
+echo "Installing extended Rust CLI tools for user: $TARGET_USER"
 
 ##############################################################################
-# Install Rust CLI tools via cargo
+# Install Rust toolchain
 ##############################################################################
-print_section "Installing Rust CLI tools"
+print_section "Installing Rust toolchain"
+
+# Install Rust system packages
+apt update
+apt install -y rustc cargo
+
+# Install Rust via rustup for the target user (more up-to-date)
+if ! sudo -u "$TARGET_USER" command -v rustup >/dev/null 2>&1; then
+    echo "Installing rustup for user $TARGET_USER..."
+    sudo -u "$TARGET_USER" bash -c 'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y'
+
+    # Add cargo/bin to PATH in .zshrc
+    sudo -u "$TARGET_USER" bash <<EOF
+if ! grep -q 'cargo/bin' "$TARGET_ZSHRC" 2>/dev/null; then
+    echo 'export PATH="\$HOME/.cargo/bin:\$PATH"  # Rust cargo path' >> "$TARGET_ZSHRC"
+fi
+EOF
+
+    echo "✔ Rust toolchain installed"
+else
+    echo "✔ Rust toolchain already installed"
+fi
+
+##############################################################################
+# Install extended Rust CLI tools via cargo
+##############################################################################
+print_section "Installing extended Rust CLI tools"
 
 # Function to install cargo tool if not already installed
 install_cargo_tool() {
@@ -49,38 +77,36 @@ install_cargo_tool() {
     fi
 }
 
-# Install core Rust CLI tools
-install_cargo_tool "rg" "ripgrep"
-install_cargo_tool "bat" "bat"
+# Install extended Rust CLI tools (rg and bat are now in core)
 install_cargo_tool "fd" "fd-find"
 install_cargo_tool "delta" "git-delta"
 install_cargo_tool "procs" "procs"
+install_cargo_tool "tokei" "tokei"
 
 ##############################################################################
-# Set up aliases for renamed tools
+# Set up aliases for tools
 ##############################################################################
 print_section "Setting up aliases"
 
 ZSH_ALIASES="$TARGET_HOME/.zsh_aliases"
-
-# bat alias (Ubuntu's apt version is called 'batcat')
-update_alias "bat" "bat" "$ZSH_ALIASES"
-
-# ripgrep alias
-update_alias "rg" "rg" "$ZSH_ALIASES"
 
 # fd alias (avoid confusion with apt's fdfind)
 update_alias "fd" "fd" "$ZSH_ALIASES"
 
 echo "✔ Rust tool aliases configured"
 
-echo -e "\n✔ Rust CLI tools setup complete!"
+echo -e "\n✔ Extended Rust CLI tools setup complete!"
 echo "Available tools:"
-echo "  - rg (ripgrep): Fast grep replacement"
-echo "  - bat: Cat with syntax highlighting"
 echo "  - fd: Fast find replacement"
 echo "  - delta: Better git diff viewer"
 echo "  - procs: Modern ps replacement"
+echo "  - tokei: Code statistics tool"
+echo ""
+echo "Usage:"
+echo "  - fd <pattern>: Fast file search"
+echo "  - git diff (uses delta automatically)"
+echo "  - procs: Modern process viewer"
+echo "  - tokei: Show code statistics"
 echo ""
 echo "💡 All tools are installed via cargo with latest versions"
 echo "💡 Restart your terminal or run 'source ~/.zshrc' to use tools"
