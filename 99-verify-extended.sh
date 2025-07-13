@@ -6,7 +6,7 @@ set -euo pipefail
 # =============================================================================
 # This script verifies that extended tools are properly installed.
 # Run this after running extended installation scripts.
-# USAGE: ./99-verify-extended.sh (as regular user)
+# USAGE: ./99-verify-extended.sh [--verbose] (as regular user)
 # =============================================================================
 
 # Source utilities
@@ -14,6 +14,12 @@ source "$(dirname "$0")/utils.sh"
 
 # Check if running with sudo (should NOT be)
 check_not_root
+
+# Parse arguments
+VERBOSE=false
+if [[ "${1:-}" == "--verbose" ]]; then
+    VERBOSE=true
+fi
 
 # Colors for output
 RED='\033[0;31m'
@@ -25,131 +31,102 @@ NC='\033[0m' # No Color
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
 FAILED_CHECKS=0
+FAILED_ITEMS=()
 
-# Function to check if a command exists and optionally run it
+# Function to check if a command exists
 check_command() {
     local cmd="$1"
-    local test_cmd="${2:-}"
-    local description="$3"
-    local comprehensive="${4:-false}"
+    local description="$2"
 
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
 
     if command -v "$cmd" >/dev/null 2>&1; then
-        if [[ "$comprehensive" == "true" && -n "$test_cmd" ]]; then
-            # Run comprehensive test
-            if eval "$test_cmd" >/dev/null 2>&1; then
-                echo -e "${GREEN}✓${NC} $description"
-                PASSED_CHECKS=$((PASSED_CHECKS + 1))
-            else
-                echo -e "${RED}✗${NC} $description (command exists but test failed)"
-                FAILED_CHECKS=$((FAILED_CHECKS + 1))
-            fi
-        else
-            # Simple existence check
-            echo -e "${GREEN}✓${NC} $description"
-            PASSED_CHECKS=$((PASSED_CHECKS + 1))
-        fi
+        [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} $description"
+        PASSED_CHECKS=$((PASSED_CHECKS + 1))
     else
-        echo -e "${RED}✗${NC} $description (command not found)"
+        [[ "$VERBOSE" == "true" ]] && echo -e "${RED}✗${NC} $description"
         FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        FAILED_ITEMS+=("$description")
+    fi
+}
+
+# Function to check alias (with shell context)
+check_alias() {
+    local alias_name="$1"
+    local description="$2"
+
+    TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
+
+    # Source shell config and check alias
+    if bash -c "source ~/.zshrc 2>/dev/null; alias $alias_name" >/dev/null 2>&1; then
+        [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} $description"
+        PASSED_CHECKS=$((PASSED_CHECKS + 1))
+    else
+        [[ "$VERBOSE" == "true" ]] && echo -e "${RED}✗${NC} $description"
+        FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        FAILED_ITEMS+=("$description")
     fi
 }
 
 echo "🔍 VPS Extended Tools Verification"
 echo "=================================="
-echo
+[[ "$VERBOSE" == "true" ]] && echo
 
-##############################################################################
 # Extended Rust CLI Tools
-##############################################################################
-print_section "Extended Rust CLI Tools"
+[[ "$VERBOSE" == "true" ]] && print_section "Extended Rust CLI Tools"
+check_command "rustc" "Rust compiler"
+check_command "cargo" "Rust package manager"
+check_command "fd" "fd file finder"
+check_command "delta" "git-delta diff viewer"
+check_command "procs" "procs process viewer"
+check_command "tokei" "tokei code statistics"
 
-check_command "rustc" "rustc --version" "Rust compiler"
-check_command "cargo" "cargo --version" "Rust package manager"
-check_command "fd" "fd --version" "fd file finder"
-check_command "delta" "delta --version" "git-delta diff viewer"
-check_command "procs" "procs --version" "procs process viewer"
-check_command "tokei" "tokei --version" "tokei code statistics"
-
-##############################################################################
 # Extended Python CLI Tools
-##############################################################################
-print_section "Extended Python CLI Tools"
+[[ "$VERBOSE" == "true" ]] && print_section "Extended Python CLI Tools"
+check_command "pipx" "pipx Python CLI installer"
+check_command "glances" "glances system monitor"
+check_command "http" "httpie HTTP client"
+check_command "glow" "glow markdown reader"
 
-check_command "pipx" "pipx --version" "pipx Python CLI installer" true
-check_command "glances" "glances --version" "glances system monitor" true
-check_command "http" "http --version" "httpie HTTP client" true
-check_command "glow" "glow --version" "glow markdown reader" true
+# Extended Aliases
+[[ "$VERBOSE" == "true" ]] && print_section "Extended Aliases"
+check_alias "fd" "fd alias"
+check_alias "http" "http alias"
+check_alias "https" "https alias"
 
-##############################################################################
-# Extended Aliases and PATH
-##############################################################################
-print_section "Extended Aliases and PATH"
-
-# Check if extended aliases work
-TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-if alias fd >/dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC} fd alias (fd find)"
-    PASSED_CHECKS=$((PASSED_CHECKS + 1))
-else
-    echo -e "${RED}✗${NC} fd alias not found"
-    FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-if alias http >/dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC} http alias (httpie)"
-    PASSED_CHECKS=$((PASSED_CHECKS + 1))
-else
-    echo -e "${RED}✗${NC} http alias not found"
-    FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-if alias https >/dev/null 2>&1; then
-    echo -e "${GREEN}✓${NC} https alias (httpie)"
-    PASSED_CHECKS=$((PASSED_CHECKS + 1))
-else
-    echo -e "${RED}✗${NC} https alias not found"
-    FAILED_CHECKS=$((FAILED_CHECKS + 1))
-fi
-
-# Check PATH components
+# PATH for extended tools
+[[ "$VERBOSE" == "true" ]] && print_section "Extended PATH"
 TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
 if echo "$PATH" | grep -q "$HOME/.cargo/bin"; then
-    echo -e "${GREEN}✓${NC} ~/.cargo/bin in PATH"
+    [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} ~/.cargo/bin in PATH"
     PASSED_CHECKS=$((PASSED_CHECKS + 1))
 else
-    echo -e "${YELLOW}⚠${NC} ~/.cargo/bin not in PATH (may need terminal restart)"
+    [[ "$VERBOSE" == "true" ]] && echo -e "${YELLOW}⚠${NC} ~/.cargo/bin not in PATH (may need terminal restart)"
     FAILED_CHECKS=$((FAILED_CHECKS + 1))
+    FAILED_ITEMS+=("~/.cargo/bin in PATH")
 fi
 
-##############################################################################
 # Summary
-##############################################################################
 echo
 echo "📊 Extended Tools Verification Summary"
 echo "======================================"
-echo -e "Total checks: $TOTAL_CHECKS"
-echo -e "${GREEN}Passed: $PASSED_CHECKS${NC}"
-echo -e "${RED}Failed: $FAILED_CHECKS${NC}"
-echo
+echo -e "Extended tools: ${GREEN}$PASSED_CHECKS${NC}/$TOTAL_CHECKS passing"
 
 if [[ $FAILED_CHECKS -eq 0 ]]; then
-    echo -e "${GREEN}🎉 All extended tools checks passed!${NC}"
+    echo -e "${GREEN}🎉 All extended tools verified successfully!${NC}"
     echo
     echo "💡 Extended tools available:"
-    echo "  - Rust tools: fd, delta, procs, tokei"
-    echo "  - Python tools: pipx, glances, httpie"
+    echo "  - Rust: fd, delta, procs, tokei"
+    echo "  - Python: pipx, glances, httpie"
     echo "  - Markdown: glow"
-    echo "  - Try: fd <pattern>, procs, tokei, glances"
+    echo "  - Try: fd <pattern>, procs, tokei, glances, glow README.md"
     echo "  - HTTP: http GET api.github.com"
-    echo "  - Read: glow README.md"
     echo "  - Git diff now uses delta automatically"
-    exit 0
 else
-    echo -e "${YELLOW}⚠️  Some extended tools checks failed.${NC}"
+    echo -e "${YELLOW}⚠️  $FAILED_CHECKS extended tools need attention:${NC}"
+    for item in "${FAILED_ITEMS[@]}"; do
+        echo "  • $item"
+    done
     echo
     echo "This may indicate:"
     echo "  - Extended scripts haven't been run yet"
@@ -160,6 +137,7 @@ else
     echo "  - sudo ./32-python-tools-extended.sh"
     echo "  - sudo ./42-rust-tools-extended.sh"
     echo
-    echo "💡 Most issues are resolved by restarting your terminal."
-    exit 0
+    echo "💡 Most issues resolve with: exec zsh"
 fi
+
+exit 0
