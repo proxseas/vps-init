@@ -1,17 +1,15 @@
 ## Initial steps
 apt update && apt install -y git
 git clone https://github.com/proxseas/vps-init.git /opt/vps-setup
-cd /opt/vps-setup/scripts
+cd /opt/vps-setup/
 
-# Option A: argument
-./00-create-user.sh newusername
+# 1. Create user first (as root)
+sudo ./00-create-user.sh <NEWUSERNAME>
 
-# Option B: env-var
-NEW_USER=newusername ./00-create-user.sh
-
-## Next - switch to new user & run the rest of the scripts
-su - newusername
-cd /opt/vps-setup/scripts
+# 2. Switch to new user and run setup
+su - newuser
+cd /opt/vps-init
+./setup.sh  # This handles everything else
 
 # now run the rest, e.g.
 bash 10-base-system.sh
