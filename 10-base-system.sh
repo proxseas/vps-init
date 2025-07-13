@@ -36,7 +36,8 @@ ufw allow 60000:61000/udp
 
 # Install essential CLI tools for system management and development
 apt install -y \
-  git curl wget htop tmux vim ripgrep ncdu pv jq make build-essential bat
+  git curl wget htop tmux vim ripgrep ncdu pv jq make build-essential bat \
+  fd-find tldr tig tree watch entr git-delta
 
 # Fix script permissions so regular user can run shell environment scripts
 if [ -d "/opt/vps-init" ] && [ -n "${SUDO_USER:-}" ]; then

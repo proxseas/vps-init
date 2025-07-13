@@ -117,12 +117,28 @@ if [[ $EUID -eq 0 ]]; then
     echo "📦 Running 31-python-tooling.sh..."
     env TARGET_USER_FROM_SETUP="$TARGET_USER" "./31-python-tooling.sh" && echo "✅ 31-python-tooling.sh completed" || echo "❌ 31-python-tooling.sh failed"
 
+    echo "📦 Running 32-python-cli-tools.sh..."
+    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./32-python-cli-tools.sh" && echo "✅ 32-python-cli-tools.sh completed" || echo "❌ 32-python-cli-tools.sh failed"
+
+    echo "📦 Running 41-binary-tools.sh..."
+    env TARGET_USER_FROM_SETUP="$TARGET_USER" "./41-binary-tools.sh" && echo "✅ 41-binary-tools.sh completed" || echo "❌ 41-binary-tools.sh failed"
+
     echo "📦 Running 50-container-tools.sh..."
     env TARGET_USER_FROM_SETUP="$TARGET_USER" "./50-container-tools.sh" && echo "✅ 50-container-tools.sh completed" || echo "❌ 50-container-tools.sh failed"
 else
     run_script "30-node-tooling.sh" "true"
     run_script "31-python-tooling.sh" "true"
+    run_script "32-python-cli-tools.sh" "true"
+    run_script "41-binary-tools.sh" "true"
     run_script "50-container-tools.sh" "true"
+fi
+
+echo
+echo "Phase 4: Verification"
+if [[ $EUID -eq 0 ]]; then
+    run_script "99-verify-installation.sh" "false" "$TARGET_USER"
+else
+    run_script "99-verify-installation.sh" "false"
 fi
 
 echo
