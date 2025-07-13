@@ -66,7 +66,7 @@ fi
 ##############################################################################
 print_section "Installing lazydocker"
 
-if ! command -v lazydocker >/dev/null; then
+if ! command -v lazydocker >/dev/null || ! lazydocker --version >/dev/null 2>&1; then
     echo "Installing lazydocker..."
 
     # Download and install lazydocker

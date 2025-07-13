@@ -43,7 +43,7 @@ check_command() {
     local result=false
     if [[ "$is_function" == "true" ]]; then
         # Check for shell function (needs shell context)
-        if bash -c "source ~/.zshrc 2>/dev/null; type $cmd" >/dev/null 2>&1; then
+        if zsh -c "source ~/.zshrc 2>/dev/null && type $cmd" >/dev/null 2>&1; then
             result=true
         fi
     else
@@ -121,8 +121,8 @@ check_alias() {
 
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
 
-    # Source shell config and check alias
-    if bash -c "source ~/.zshrc 2>/dev/null; alias $alias_name" >/dev/null 2>&1; then
+    # Use zsh instead of bash and ensure proper context loading
+    if zsh -c "source ~/.zshrc 2>/dev/null && alias $alias_name" >/dev/null 2>&1; then
         [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} $description"
         PASSED_CHECKS=$((PASSED_CHECKS + 1))
     else
@@ -196,7 +196,16 @@ check_command "fnm" "fnm (Node)"
 check_command "node" "Node.js"
 check_command "npm" "npm"
 check_command "docker" "Docker"
-check_command "lazydocker" "lazydocker"
+# Check lazydocker with more specific path checking
+TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
+if command -v lazydocker >/dev/null 2>&1 || [[ -f "/usr/local/bin/lazydocker" ]]; then
+    [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} lazydocker"
+    PASSED_CHECKS=$((PASSED_CHECKS + 1))
+else
+    [[ "$VERBOSE" == "true" ]] && echo -e "${RED}✗${NC} lazydocker"
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
+    FAILED_ITEMS+=("lazydocker")
+fi
 
 # Core Binary Tools
 [[ "$VERBOSE" == "true" ]] && print_section "Core Binary Tools"

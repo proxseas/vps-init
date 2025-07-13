@@ -66,8 +66,8 @@ EDITOR='vim'
 setopt cdablevars
 export TERM='xterm-256color'
 
-# Custom prompt with username (hostname truncated at first dash, no % sign)
-PROMPT='%F{cyan}%n%f@%F{yellow}${${(%):-%m}%%-*}%f:%F{green}%~%f '
+# Custom prompt with username (hostname truncated at first dash, no colon)
+PROMPT='%F{cyan}%n%f@%F{yellow}${${(%):-%m}%%-*}%f %F{green}%~%f '
 
 # auto-ls on cd
 autoload -U add-zsh-hook
