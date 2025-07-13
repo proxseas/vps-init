@@ -74,7 +74,8 @@ echo "Phase 1: System Setup (requires root)"
 if [[ $EUID -eq 0 ]]; then
     if ! getent passwd "$TARGET_USER" >/dev/null; then
         echo "Creating user: $TARGET_USER"
-        NEW_USER="$TARGET_USER" run_script "00-create-user.sh" "true"
+        echo "📦 Running 00-create-user.sh..."
+        env CALLED_FROM_SETUP="true" NEW_USER="$TARGET_USER" "./00-create-user.sh" && echo "✅ 00-create-user.sh completed" || echo "❌ 00-create-user.sh failed"
     else
         echo "✅ User $TARGET_USER already exists, skipping creation"
     fi

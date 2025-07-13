@@ -2,6 +2,9 @@
 
 Automated scripts for setting up a new VPS with development tools and user environment.
 
+# How best to READ *me* (this README.md file)
+Use `batcat`
+
 ## Prerequisites (As Root)
 
 Before running any setup scripts, clone this repository:
