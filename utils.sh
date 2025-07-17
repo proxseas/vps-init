@@ -25,6 +25,31 @@ update_alias() {
     fi
 }
 
+# Adds a block of shell functions using heredoc with marker system
+add_functions_block() {
+    local file="$1"
+    local marker="$2"
+
+    touch "$file"
+
+    # Only add if marker doesn't exist
+    if ! grep -q "$marker" "$file" 2>/dev/null; then
+        cat >> "$file" << EOF
+
+# $marker
+function awkn {
+  cmd="awk '{print \\\$$1}'"
+  eval "\$cmd"
+}
+
+function awklast {
+  cmd="awk '{print \\\$NF}'"
+  eval "\$cmd"
+}
+EOF
+    fi
+}
+
 # Check if running with correct privileges
 check_root() {
     if [[ $EUID -ne 0 ]]; then

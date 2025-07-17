@@ -87,8 +87,13 @@ ZSH_ALIASES="$HOME/.zsh_aliases"
 
 # General aliases
 update_alias "q" "exit" "$ZSH_ALIASES"
-update_alias "reloadzsh" "source ~/.zshrc" "$ZSH_ALIASES"
 update_alias "editzsh" "vim ~/.zshrc" "$ZSH_ALIASES"
+update_alias "editzsh" "vim ~/.zshrc" "$ZSH_ALIASES"
+update_alias "reloadzsh" "source ~/.zshrc" "$ZSH_ALIASES"
+## editaliases and reloadaliases
+update alias "editaliases" "vim $ZSH_ALIASES" "$ZSH_ALIASES"
+update_alias "reloadaliases" "source $ZSH_ALIASES" "$ZSH_ALIASES"
+
 
 # Directory listing (eza)
 update_alias "ls" "eza" "$ZSH_ALIASES"
@@ -114,6 +119,16 @@ update_alias "lzd" "lazydocker" "$ZSH_ALIASES"
 
 echo "✔ Aliases configured in $ZSH_ALIASES"
 
+##############################################################################
+# Shell Functions Setup
+##############################################################################
+print_section "Setting up shell functions"
+
+# Add awk helper functions
+add_functions_block "$ZSH_ALIASES" "AWK_HELPERS"
+
+echo "✔ Shell functions configured in $ZSH_ALIASES"
+
 echo -e "\n🎉 Development tools setup complete!"
 echo "Available tools:"
 echo "  - eza: Modern ls replacement"
@@ -128,5 +143,9 @@ echo "  - q: Quick exit"
 echo "  - tl, ta: Tmux shortcuts"
 echo "  - mkvenv, actvenv, takevenv: Python virtual env helpers"
 echo "  - lzd: Lazydocker shortcut"
+echo ""
+echo "Available functions:"
+echo "  - awkn N: Print field N from input (e.g., 'ls -l | awkn 3')"
+echo "  - awklast: Print last field from input (e.g., 'ls -l | awklast')"
 echo ""
 echo "💡 Restart your terminal or run 'source ~/.zshrc' to use aliases"
