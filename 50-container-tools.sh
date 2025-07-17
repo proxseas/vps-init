@@ -40,15 +40,15 @@ if ! command -v docker >/dev/null; then
     apt-get update
     apt-get install -y ca-certificates curl gnupg lsb-release
 
-    # Add Docker GPG key & repo
+  # Add Docker GPG key & repo
     install -d -m0755 /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
         | gpg --dearmor -o /etc/apt/keyrings/docker.asc
     chmod a+r /etc/apt/keyrings/docker.asc
 
-    echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-        https://download.docker.com/linux/ubuntu \
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
+    https://download.docker.com/linux/ubuntu \
         $(. /etc/os-release && echo $VERSION_CODENAME) stable" \
         | tee /etc/apt/sources.list.d/docker.list >/dev/null
 
@@ -111,13 +111,31 @@ if ! command -v lazydocker >/dev/null || ! sudo -u "$TARGET_USER" lazydocker --v
     cd - >/dev/null
     rm -rf "$TEMP_DIR"
 
-    # Add alias for target user
-    echo "alias lzd='lazydocker'" >> "$TARGET_HOME/.zsh_aliases"
-
-    echo "✔ lazydocker installed and alias lzd added"
+    echo "✔ lazydocker installed"
 else
     echo "✔ lazydocker already installed"
 fi
+
+print_section "Configuring aliases"
+
+ALIASES_FILE="$TARGET_HOME/.zsh_aliases"
+
+# Helper to add an alias if it's not already in the file
+add_alias_if_not_exists() {
+    local alias_def="$1"
+    if ! grep -qF -- "$alias_def" "$ALIASES_FILE" 2>/dev/null; then
+        echo "$alias_def" >> "$ALIASES_FILE"
+    fi
+}
+
+# Add aliases for Docker and lazydocker
+add_alias_if_not_exists "alias lzd='lazydocker'"
+add_alias_if_not_exists "alias d='docker'"
+add_alias_if_not_exists "alias dps='docker ps'"
+add_alias_if_not_exists "alias dc='docker compose' # Use new Compose V2 syntax"
+add_alias_if_not_exists "alias dcu='docker compose up'"
+add_alias_if_not_exists "alias dcud='docker compose up -d'"
+echo "✔ Docker and lazydocker aliases configured."
 
 echo -e "\n✔ Container tools setup complete!"
 echo "Available tools:"
@@ -127,5 +145,6 @@ echo ""
 echo "Usage:"
 echo "  - docker ps: List containers"
 echo "  - lzd: Launch lazydocker TUI"
+echo "  - d, dps, dc, dcu, dcud: Docker aliases"
 echo ""
 echo "💡 You may need to restart your terminal or re-login for Docker group membership to take effect"
