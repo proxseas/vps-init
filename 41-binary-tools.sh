@@ -52,7 +52,23 @@ else
     echo "✔ zoxide already installed"
 fi
 
+##############################################################################
+# Install lazygit (Git TUI)
+##############################################################################
+print_section "Installing lazygit"
 
+if ! command -v lazygit >/dev/null 2>&1; then
+    echo "Installing lazygit..."
+    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \
+        grep -Po '"tag_name": *"v\K[^"]*')
+    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+    tar xf lazygit.tar.gz lazygit
+    sudo install lazygit -D -t /usr/local/bin/
+    rm -f lazygit.tar.gz lazygit  # cleanup
+    echo "✔ lazygit installed"
+else
+    echo "✔ lazygit already installed"
+fi
 
 ##############################################################################
 # Add useful aliases
@@ -68,15 +84,20 @@ source "$(dirname "$0")/utils.sh"
 update_alias "cd" "z" "$ZSH_ALIASES"
 update_alias "cdi" "zi" "$ZSH_ALIASES"  # interactive cd
 
+# lazygit alias
+update_alias "lg" "lazygit" "$ZSH_ALIASES"
+
 echo "✔ Aliases configured"
 
 echo -e "\n✔ Binary tools setup complete!"
 echo "Available tools:"
 echo "  - zoxide: Smart cd replacement (z, zi commands)"
+echo "  - lazygit: Git TUI (lg command)"
 echo ""
 echo "Usage:"
 echo "  - z <directory>: Smart directory navigation"
 echo "  - zi: Interactive directory selection"
+echo "  - lg: Launch lazygit Git TUI"
 echo ""
 echo "💡 Restart your terminal or run 'source ~/.zshrc' to use new tools"
 echo ""

@@ -213,11 +213,13 @@ fi
 # Core Binary Tools
 [[ "$VERBOSE" == "true" ]] && print_section "Core Binary Tools"
 check_command "zoxide" "zoxide"
+check_command "lazygit" "lazygit"
 
 # Aliases and Functions
 [[ "$VERBOSE" == "true" ]] && print_section "Aliases and Functions"
 check_alias "ll" "ll alias (eza)"
 check_command "z" "z function (zoxide)" "true"
+check_alias "lg" "lg alias (lazygit)"
 
 # PATH
 [[ "$VERBOSE" == "true" ]] && print_section "PATH"
@@ -243,6 +245,7 @@ if [[ $FAILED_CHECKS -eq 0 ]]; then
     echo
     echo "💡 Quick start:"
     echo "  - ll, z <directory>, rg <pattern>, bat <file>"
+    echo "  - Git: lg (lazygit)"
     echo "  - Docker: lzd (lazydocker)"
     echo
     echo "🚀 Install extended tools:"
