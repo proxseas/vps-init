@@ -93,6 +93,8 @@ update_alias "reloadzsh" "source ~/.zshrc" "$ZSH_ALIASES"
 ## editaliases and reloadaliases
 update alias "editaliases" "vim $ZSH_ALIASES" "$ZSH_ALIASES"
 update_alias "reloadaliases" "source $ZSH_ALIASES" "$ZSH_ALIASES"
+## Others
+update_alias "clr" "clear" "$ZSH_ALIASES"
 
 
 # Directory listing (eza)
