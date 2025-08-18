@@ -42,7 +42,6 @@ call plug#begin('~/.vim/plugged')
   Plug 'stephpy/vim-yaml'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
-  Plug 'ojroques/vim-oscyank'
   Plug 'machakann/vim-highlightedyank'
 call plug#end()
 
@@ -52,10 +51,6 @@ silent! colorscheme badwolf
 " FZF key bindings
 nnoremap <C-p> :Files<CR>
 nnoremap <C-f> :Rg<CR>
-
-# Configure OSCYank for yanking text
-let g:oscyank_max_length = 1000000
-autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | execute 'OSCYankRegister "' | endif
 
 # Configure Highlightedyank plugin settings
 let g:highlightedyank_highlight_duration = 90

@@ -42,17 +42,11 @@ set -g history-limit 10000
 
 ## Plugins
 set -g @plugin 'tmux-plugins/tpm'         # Always first
-set -g @plugin 'tmux-plugins/tmux-yank'   # Then whatever plugins you want
 
 # Below the plugin lines — initialize TPM:
 run '~/.tmux/plugins/tpm/tpm'
 
-## Yank to clipboard
-set -s set-clipboard on    # Enable clipboard integration
-# set -g allow-passthrough   # Let OSC 52 pass through tmux to Kitty
-
 # set -g mouse on
-set -g @clipboard 'external'
 
 setw -g mode-keys vi
 
@@ -113,5 +107,4 @@ setw -g clock-mode-colour yellow
 EOF
 
 echo "✔ Tmux configuration complete"
-echo "💡 After restarting tmux, press Prefix+I (usually Ctrl+b, then I) to install plugins"
 echo "💡 Tmux aliases (tl, ta) will be set up by dev-tools script"

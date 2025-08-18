@@ -49,9 +49,9 @@ done
 
 # enable plugins in ~/.zshrc (z plugin for fallback)
 if grep -q '^plugins=' "$ZSHRC"; then
-  sed -i 's/^plugins=.*/plugins=(git z zsh-autosuggestions history-substring-search)/' "$ZSHRC"
+  sed -i 's/^plugins=.*/plugins=(git z zsh-autosuggestions zsh-syntax-highlighting history-substring-search)/' "$ZSHRC"
 else
-  echo 'plugins=(git z zsh-autosuggestions history-substring-search)' >> "$ZSHRC"
+  echo 'plugins=(git z zsh-autosuggestions zsh-syntax-highlighting history-substring-search)' >> "$ZSHRC"
 fi
 
 # Remove old explicit syntax-highlighting source line
@@ -68,9 +68,7 @@ export TERM='xterm-256color'
 # Custom prompt with username (hostname truncated at first dash, no colon)
 PROMPT='%F{cyan}%n%f@%F{yellow}${${(%):-%m}%%-*}%f %F{green}%~%f '
 
-# auto-ls on cd
-autoload -U add-zsh-hook
-add-zsh-hook -Uz chpwd (){ ls -a; }
+# auto-ls on cd functionality removed
 
 # load aliases if present
 [ -f ~/.zsh_aliases ] && source ~/.zsh_aliases
@@ -97,10 +95,7 @@ elif [[ -f "$HOME/z.sh" ]]; then
   source "$HOME/z.sh"
 fi
 
-# zsh-syntax-highlighting LAST
-if [[ -f "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-  source "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-fi
+# zsh-syntax-highlighting is handled by oh-my-zsh plugins system
 EOF
 
 # ---- 2. Make Zsh the default shell ----
