@@ -37,7 +37,7 @@ ufw allow 60000:61000/udp
 # Install essential CLI tools for system management and development
 apt install -y \
   git curl wget htop tmux vim ncdu pv jq make build-essential \
-  tldr tig tree watch entr
+  tldr tig tree watch entr zsh
 
 # Note: ripgrep, bat, fd-find, git-delta will be installed via cargo for latest versions
 
