@@ -51,7 +51,8 @@ fi
 # 2) just (task runner) - direct binary download
 if ! command -v just >/dev/null; then
   echo "Installing just..."
-  curl -sL https://github.com/casey/just/releases/latest/download/just-$(uname -m)-unknown-linux-musl.tar.gz | \
+  JUST_VERSION=$(curl -s "https://api.github.com/repos/casey/just/releases/latest" | grep -Po '"tag_name": *"\K[^"]*')
+  curl -sL "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" | \
     sudo tar xz -C /usr/local/bin just
   echo "✔ just installed"
 else
@@ -91,7 +92,7 @@ update_alias "editzsh" "vim ~/.zshrc" "$ZSH_ALIASES"
 update_alias "editzsh" "vim ~/.zshrc" "$ZSH_ALIASES"
 update_alias "reloadzsh" "source ~/.zshrc" "$ZSH_ALIASES"
 ## editaliases and reloadaliases
-update alias "editaliases" "vim $ZSH_ALIASES" "$ZSH_ALIASES"
+update_alias "editaliases" "vim $ZSH_ALIASES" "$ZSH_ALIASES"
 update_alias "reloadaliases" "source $ZSH_ALIASES" "$ZSH_ALIASES"
 ## Others
 update_alias "clr" "clear" "$ZSH_ALIASES"
