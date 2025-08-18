@@ -40,18 +40,18 @@ fi
 ZSHRC="$HOME/.zshrc"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
-# plugins (including z for fallback to z.sh)
+# plugins
 for p in zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search; do
   if [ ! -d "$ZSH_CUSTOM/plugins/$p" ]; then
     git clone --depth=1 "https://github.com/zsh-users/$p" "$ZSH_CUSTOM/plugins/$p"
   fi
 done
 
-# enable plugins in ~/.zshrc (z plugin for fallback)
+# enable plugins in ~/.zshrc
 if grep -q '^plugins=' "$ZSHRC"; then
-  sed -i 's/^plugins=.*/plugins=(git z zsh-autosuggestions zsh-syntax-highlighting history-substring-search)/' "$ZSHRC"
+  sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting history-substring-search)/' "$ZSHRC"
 else
-  echo 'plugins=(git z zsh-autosuggestions zsh-syntax-highlighting history-substring-search)' >> "$ZSHRC"
+  echo 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting history-substring-search)' >> "$ZSHRC"
 fi
 
 # Remove old explicit syntax-highlighting source line
