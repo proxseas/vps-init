@@ -52,11 +52,11 @@ silent! colorscheme badwolf
 nnoremap <C-p> :Files<CR>
 nnoremap <C-f> :Rg<CR>
 
-# Configure Highlightedyank plugin settings
+" Configure Highlightedyank plugin settings
 let g:highlightedyank_highlight_duration = 90
 let g:highlightedyank_highlight_group = 'IncSearch'
 
-# Map Ctrl+Underscore to toggle line comments in normal, visual, and insert modes
+" Map Ctrl+Underscore to toggle line comments in normal, visual, and insert modes
 nnoremap <C-_> :normal gcc<CR>
 vnoremap <C-_> :normal gc<CR>
 inoremap <C-_> <Esc>:normal gcc<CR>
