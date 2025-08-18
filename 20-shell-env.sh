@@ -40,23 +40,22 @@ fi
 ZSHRC="$HOME/.zshrc"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
-# plugins
+# plugins (including z for fallback to z.sh)
 for p in zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search; do
   if [ ! -d "$ZSH_CUSTOM/plugins/$p" ]; then
     git clone --depth=1 "https://github.com/zsh-users/$p" "$ZSH_CUSTOM/plugins/$p"
   fi
 done
 
-# enable plugins in ~/.zshrc
+# enable plugins in ~/.zshrc (z plugin for fallback)
 if grep -q '^plugins=' "$ZSHRC"; then
-  sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting history-substring-search)/' "$ZSHRC"
+  sed -i 's/^plugins=.*/plugins=(git z zsh-autosuggestions history-substring-search)/' "$ZSHRC"
 else
-  echo 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting history-substring-search)' >> "$ZSHRC"
+  echo 'plugins=(git z zsh-autosuggestions history-substring-search)' >> "$ZSHRC"
 fi
 
-# ensure syntax-highlighting is sourced after OMZ
-grep -q 'zsh-syntax-highlighting.zsh' "$ZSHRC" 2>/dev/null \
-  || sed -i "/^source .*oh-my-zsh\.sh/a source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" "$ZSHRC"
+# Remove old explicit syntax-highlighting source line
+sed -i '/source.*zsh-syntax-highlighting.*zsh-syntax-highlighting\.zsh/d' "$ZSHRC"
 
 # misc zsh tweaks
 grep -q '^EDITOR=' "$ZSHRC" 2>/dev/null || cat >> "$ZSHRC" <<'EOF'
@@ -75,6 +74,33 @@ add-zsh-hook -Uz chpwd (){ ls -a; }
 
 # load aliases if present
 [ -f ~/.zsh_aliases ] && source ~/.zsh_aliases
+
+## human-friendly ts function
+## Examples:
+## * some_app | tee "$(ts a.txt)"
+## * touch "$(ts notes.md)"
+## * vim "$(ts scratch.md)"
+ts() { date +%Y-%m-%d_%H-%M-%S | xargs -I{} printf "%s_%s\n" {} "$1"; }
+
+# Suspend widget and keybind tweaks
+suspend-widget() { builtin suspend }
+zle -N suspend-widget
+# Keybind tweaks
+bindkey -r '^[l'               # free Alt+l
+bindkey -M emacs '^Z' suspend-widget
+bindkey -M viins '^Z' suspend-widget
+
+# zoxide init (with z.sh fallback) - will be added by binary-tools script if installed
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+elif [[ -f "$HOME/z.sh" ]]; then
+  source "$HOME/z.sh"
+fi
+
+# zsh-syntax-highlighting LAST
+if [[ -f "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
 EOF
 
 # ---- 2. Make Zsh the default shell ----

@@ -39,7 +39,21 @@ print_section "Node.js Tooling (fnm)"
 # ---- install fnm (fast Node version manager) ----
 sudo -u "$TARGET_USER" bash -c 'curl -fsSL https://fnm.vercel.app/install | bash'
 
-# Note: fnm installer automatically adds configuration to .zshrc
+# Add explicit fnm initialization to .zshrc (more reliable than installer)
+sudo -u "$TARGET_USER" bash <<EOF
+if ! grep -q 'fnm init' "$TARGET_ZSHRC" 2>/dev/null; then
+    cat >> "$TARGET_ZSHRC" <<'FNMEOF'
+
+# fnm init (quiet)
+FNM_PATH="\$HOME/.local/share/fnm"
+if [ -d "\$FNM_PATH" ]; then
+  export PATH="\$FNM_PATH:\$PATH"
+  eval "\$(fnm env)"
+fi
+FNMEOF
+fi
+EOF
+
 echo "✔  fnm installed."
 
 ##############################################################################

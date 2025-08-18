@@ -82,6 +82,7 @@ install_cargo_tool "fd" "fd-find"
 install_cargo_tool "delta" "git-delta"
 install_cargo_tool "procs" "procs"
 install_cargo_tool "tokei" "tokei"
+install_cargo_tool "eza" "eza"
 
 ##############################################################################
 # Set up aliases for tools
@@ -93,6 +94,21 @@ ZSH_ALIASES="$TARGET_HOME/.zsh_aliases"
 # fd alias (avoid confusion with apt's fdfind)
 update_alias "fd" "fd" "$ZSH_ALIASES"
 
+# Add conditional eza aliases
+if ! grep -q '# Prefer eza over ls' "$ZSH_ALIASES" 2>/dev/null; then
+    sudo -u "$TARGET_USER" bash -c "cat >> '$ZSH_ALIASES'" <<'EOF'
+
+# Prefer eza over ls if available
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza'
+  alias ll='eza -l --git'
+  alias la='eza -la --git'
+else
+  alias ll='ls -lah'
+fi
+EOF
+fi
+
 echo "✔ Rust tool aliases configured"
 
 echo -e "\n✔ Extended Rust CLI tools setup complete!"
@@ -101,12 +117,14 @@ echo "  - fd: Fast find replacement"
 echo "  - delta: Better git diff viewer"
 echo "  - procs: Modern ps replacement"
 echo "  - tokei: Code statistics tool"
+echo "  - eza: Modern ls replacement"
 echo ""
 echo "Usage:"
 echo "  - fd <pattern>: Fast file search"
 echo "  - git diff (uses delta automatically)"
 echo "  - procs: Modern process viewer"
 echo "  - tokei: Show code statistics"
+echo "  - ls, ll, la (will use eza if installed)"
 echo ""
 echo "💡 All tools are installed via cargo with latest versions"
 echo "💡 Restart your terminal or run 'source ~/.zshrc' to use tools"

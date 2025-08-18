@@ -19,20 +19,20 @@ print_section "Tmux Configuration"
 
 TMUX_CONF="$HOME/.tmux.conf"
 
-# Set zsh as default shell for tmux
-if ! grep -qxF 'set-option -g default-shell /usr/bin/zsh' "$TMUX_CONF" 2>/dev/null; then
-    echo 'set-option -g default-shell /usr/bin/zsh' >> "$TMUX_CONF"
+# Install TPM (Tmux Plugin Manager) if not present
+if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+    echo "Installing TPM (Tmux Plugin Manager)..."
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    echo "✔ TPM installed"
+else
+    echo "✔ TPM already installed"
 fi
 
-# Add basic tmux configuration if file is empty or doesn't exist
-if [[ ! -f "$TMUX_CONF" ]] || [[ ! -s "$TMUX_CONF" ]]; then
-    cat > "$TMUX_CONF" <<'EOF'
+# Create comprehensive tmux configuration
+cat > "$TMUX_CONF" <<'EOF'
 # Set zsh as default shell and terminal to xterm-256color
-set-option -g default-shell /usr/bin/zsh
+set-option -g default-shell /bin/zsh
 set -g default-terminal "xterm-256color"
-
-# Reload config file
-bind r source-file ~/.tmux.conf \; display-message "TMUX Config reloaded!"
 
 ## Set the displaying of seconds
 set -g status-right "%H:%M:%S"
@@ -40,29 +40,78 @@ set -g status-interval 1
 
 set -g history-limit 10000
 
-# switch panes using Alt-arrow without prefix
+## Plugins
+set -g @plugin 'tmux-plugins/tpm'         # Always first
+set -g @plugin 'tmux-plugins/tmux-yank'   # Then whatever plugins you want
+
+# Below the plugin lines — initialize TPM:
+run '~/.tmux/plugins/tpm/tpm'
+
+## Yank to clipboard
+set -s set-clipboard on    # Enable clipboard integration
+# set -g allow-passthrough   # Let OSC 52 pass through tmux to Kitty
+
+# set -g mouse on
+set -g @clipboard 'external'
+
+setw -g mode-keys vi
+
+## Reload Prefix+r
+bind r source-file ~/.tmux.conf \; display "Manually reloaded TMUX config"
+
+## Alt+m => toggle zoom for active pane
+bind -n M-m resize-pane -Z
+
+# Switch panes using Alt-arrow without prefix
 bind -n M-Left select-pane -L
 bind -n M-Right select-pane -R
 bind -n M-Up select-pane -U
 bind -n M-Down select-pane -D
 
-## Vim-like pane navigation
-bind -n 'M-h' select-pane -L
-bind -n 'M-j' select-pane -D
-bind -n 'M-k' select-pane -U
-bind -n 'M-l' select-pane -R
-
-## Split panes using Ctrl-Alt-arrow without prefix
+## Split windows using C-M-h|j|k|l
 bind -n 'C-M-h' split-window -h
 bind -n 'C-M-l' split-window -h
 bind -n 'C-M-j' split-window -v
 bind -n 'C-M-k' split-window -v
 
-# Enable mouse support
-# set -g mouse on
+## Alt+hjkl => select pane
+bind -n M-h select-pane -L
+bind -n M-j select-pane -D
+bind -n M-k select-pane -U
 
+## this one is more tricky
+# unbind any old literal "l"
+unbind -n M-l
+bind -n M-l select-pane -R
+
+## Shift+Alt+hjkl =>  Resize panes
+unbind -n M-H; bind -n M-H resize-pane -L 5
+unbind -n M-J; bind -n M-J resize-pane -D 5
+unbind -n M-K; bind -n M-K resize-pane -U 5
+unbind -n M-L; bind -n M-L resize-pane -R 5
+
+## Rename Pane
+bind , command-prompt -I "#W" "rename-window '%%'"
+
+# switch windows using Shift-arrow without prefix
+bind -n S-Left previous-window
+bind -n S-Right next-window
+
+## more visual customizations
+### panes
+set -g pane-border-style 'fg=yellow'
+set -g pane-active-border-style 'fg=green'
+### status bar
+set -g status-style 'fg=green'
+setw -g window-status-current-style 'fg=black bg=green'
+setw -g window-status-current-format ' #I #W #F '
+setw -g window-status-style 'fg=green bg=black'
+setw -g window-status-format ' #I #[fg=white]#W #[fg=yellow]#F '
+setw -g window-status-bell-style 'fg=black bg=yellow bold'
+# clock mode
+setw -g clock-mode-colour yellow
 EOF
-fi
 
 echo "✔ Tmux configuration complete"
+echo "💡 After restarting tmux, press Prefix+I (usually Ctrl+b, then I) to install plugins"
 echo "💡 Tmux aliases (tl, ta) will be set up by dev-tools script"
