@@ -40,20 +40,21 @@ if ! command -v docker >/dev/null; then
     apt-get update
     apt-get install -y ca-certificates curl gnupg lsb-release
 
-  # Add Docker GPG key & repo
-    install -d -m0755 /etc/apt/keyrings
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-        | gpg --dearmor -o /etc/apt/keyrings/docker.asc
-    chmod a+r /etc/apt/keyrings/docker.asc
+    # Clean up any existing Docker repo configuration
+    rm -f /etc/apt/sources.list.d/docker.list
+    rm -f /etc/apt/keyrings/docker.*
 
-  echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-    https://download.docker.com/linux/ubuntu \
-        $(. /etc/os-release && echo $VERSION_CODENAME) stable" \
-        | tee /etc/apt/sources.list.d/docker.list >/dev/null
+    # Add Docker GPG key & repo (using official method)
+    install -d -m0755 /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
+
+    # Add repository using lsb_release for better compatibility
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+        tee /etc/apt/sources.list.d/docker.list > /dev/null
 
     apt-get update
-    apt-get install -y docker-ce docker-ce-cli containerd.io
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     echo "✔ Docker CE installed."
 else
     echo "✔ Docker already installed"
