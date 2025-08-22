@@ -35,6 +35,9 @@ set number relativenumber
 set hlsearch incsearch ignorecase wrap autoindent cursorline tabstop=2
 syntax on
 
+" Set spacebar as leaderkey
+let mapleader = " "
+
 call plug#begin('~/.vim/plugged')
   Plug 'sjl/badwolf'
   Plug 'tpope/vim-surround'
@@ -49,8 +52,12 @@ call plug#end()
 silent! colorscheme badwolf
 
 " FZF key bindings
-nnoremap <C-p> :Files<CR>
-nnoremap <C-f> :Rg<CR>
+" Use <leader>f for file search (now Space+f)
+nnoremap <leader>f :Files<CR>
+" Use <leader>r for ripgrep search (now Space+r)
+nnoremap <leader>r :Rg<CR>
+" Use <leader>b for buffers (now Space+b)
+nnoremap <leader>b :Buffers<CR>
 
 " Configure Highlightedyank plugin settings
 let g:highlightedyank_highlight_duration = 90
