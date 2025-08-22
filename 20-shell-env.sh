@@ -66,7 +66,21 @@ setopt cdablevars
 export TERM='xterm-256color'
 
 # Custom prompt with username (hostname truncated at first dash, no colon)
-PROMPT='%F{cyan}%n%f@%F{yellow}${${(%):-%m}%%-*}%f %F{green}%~%f '
+get_curr_git_branch() {
+  local branch
+  branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  if [[ -n $branch ]]; then
+    local n=8   # start chars
+    local m=5   # end chars
+    if (( ${#branch} > n + m + 1 )); then
+      echo " %F{magenta}(${branch:0:$n}…${branch: -$m})%f"
+    else
+      echo " %F{magenta}($branch)%f"
+    fi
+  fi
+}
+
+PROMPT='%F{cyan}%n%f@%F{yellow}${${(%):-%m}%%-*}%f$(get_curr_git_branch) %F{green}%1~%f $ '
 
 # auto-ls on cd functionality removed
 
