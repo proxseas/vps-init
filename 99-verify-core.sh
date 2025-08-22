@@ -215,6 +215,22 @@ fi
 check_command "zoxide" "zoxide"
 check_command "lazygit" "lazygit"
 
+# SSH and Git Configuration
+[[ "$VERBOSE" == "true" ]] && print_section "SSH and Git Configuration"
+check_file "$HOME/.ssh/id_rsa" "SSH private key"
+check_file "$HOME/.ssh/id_rsa.pub" "SSH public key"
+
+# Check Git configuration
+TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
+if git config --global user.name >/dev/null 2>&1 && git config --global user.email >/dev/null 2>&1; then
+    [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} Git configuration (name & email)"
+    PASSED_CHECKS=$((PASSED_CHECKS + 1))
+else
+    [[ "$VERBOSE" == "true" ]] && echo -e "${RED}✗${NC} Git configuration (name & email)"
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
+    FAILED_ITEMS+=("Git configuration")
+fi
+
 # Aliases and Functions
 [[ "$VERBOSE" == "true" ]] && print_section "Aliases and Functions"
 check_alias "ll" "ll alias (eza)"

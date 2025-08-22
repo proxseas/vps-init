@@ -96,7 +96,7 @@ sudo ./42-rust-tools-extended.sh    # fd, git-delta, procs, tokei + rust toolcha
 
 **Security Hardening (Optional):**
 ```bash
-sudo ./15-configure-ssh-security.sh  # Disable password auth, harden SSH
+sudo ./15-configure-ssh-security.sh  # Generate SSH keys, configure Git, harden SSH
 ```
 
 ### Runtime Checks
@@ -135,7 +135,7 @@ sudo ./32-python-tools-extended.sh
 # Verify extended tools
 ./99-verify-extended.sh
 
-# Harden SSH security (disable password auth)
+# Generate SSH keys, configure Git, and harden SSH security
 sudo ./15-configure-ssh-security.sh
 ```
 

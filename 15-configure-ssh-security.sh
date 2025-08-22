@@ -2,10 +2,13 @@
 set -euo pipefail
 
 # =============================================================================
-# 15-configure-ssh-security.sh - SSH security hardening (REQUIRES SUDO)
+# 15-configure-ssh-security.sh - SSH keys, Git config & security hardening (REQUIRES SUDO)
 # =============================================================================
-# This script hardens SSH security by disabling password authentication.
-# It verifies SSH keys are properly configured before making changes.
+# This script:
+# 1. Generates SSH keys if they don't exist (RSA 4096)
+# 2. Configures Git with smart defaults (username@hostname)
+# 3. Hardens SSH security by disabling password authentication
+# 4. Verifies SSH keys are properly configured before making changes
 # USAGE: sudo ./15-configure-ssh-security.sh [username]
 # =============================================================================
 
@@ -33,18 +36,64 @@ SSH_CONFIG="/etc/ssh/sshd_config"
 echo "Configuring SSH security for user: $TARGET_USER"
 
 ##############################################################################
+# Generate SSH keys if they don't exist
+##############################################################################
+print_section "Setting up SSH keys"
+
+# Check if SSH key already exists
+if [[ -f "$TARGET_HOME/.ssh/id_rsa" ]]; then
+    echo "✔ SSH key already exists for user $TARGET_USER"
+else
+    echo "Generating SSH key for user $TARGET_USER..."
+
+    # Create .ssh directory if it doesn't exist
+    sudo -u "$TARGET_USER" mkdir -p "$TARGET_HOME/.ssh"
+    sudo -u "$TARGET_USER" chmod 700 "$TARGET_HOME/.ssh"
+
+    # Generate SSH key with smart defaults
+    EMAIL="$TARGET_USER@$(hostname)"
+    echo "Generating RSA 4096 key with email: $EMAIL"
+
+    sudo -u "$TARGET_USER" ssh-keygen -t rsa -b 4096 -C "$EMAIL" -f "$TARGET_HOME/.ssh/id_rsa" -N ""
+
+    echo "✔ SSH key generated successfully"
+    echo "Public key location: $TARGET_HOME/.ssh/id_rsa.pub"
+fi
+
+##############################################################################
+# Configure Git
+##############################################################################
+print_section "Configuring Git"
+
+# Set Git user name and email using smart defaults
+GIT_NAME="$TARGET_USER"
+GIT_EMAIL="$TARGET_USER@$(hostname)"
+
+echo "Setting Git configuration for user: $TARGET_USER"
+echo "Name: $GIT_NAME"
+echo "Email: $GIT_EMAIL"
+
+sudo -u "$TARGET_USER" git config --global user.name "$GIT_NAME"
+sudo -u "$TARGET_USER" git config --global user.email "$GIT_EMAIL"
+
+echo "✔ Git configuration complete"
+
+##############################################################################
 # Verify SSH key setup
 ##############################################################################
 print_section "Verifying SSH key configuration"
 
 # Check if user has SSH authorized_keys
 if [[ ! -f "$TARGET_HOME/.ssh/authorized_keys" ]]; then
-    echo "❌ Error: No SSH keys found for user $TARGET_USER" >&2
-    echo "Please set up SSH keys before running this script:" >&2
-    echo "1. On your local machine: ssh-keygen (if you don't have keys)" >&2
-    echo "2. Copy your public key: ssh-copy-id $TARGET_USER@<server-ip>" >&2
+    echo "❌ Error: No SSH authorized_keys found for user $TARGET_USER" >&2
+    echo "SSH key has been generated, but you need to set up authorized_keys:" >&2
+    echo "1. Copy your LOCAL public key to this server:" >&2
+    echo "   ssh-copy-id $TARGET_USER@<server-ip>" >&2
+    echo "2. OR manually add your public key to $TARGET_HOME/.ssh/authorized_keys" >&2
     echo "3. Test login: ssh $TARGET_USER@<server-ip>" >&2
-    echo "4. Then run this script again" >&2
+    echo "4. Then run this script again to harden SSH security" >&2
+    echo "" >&2
+    echo "Generated server key is available at: $TARGET_HOME/.ssh/id_rsa.pub" >&2
     exit 1
 fi
 
@@ -179,8 +228,10 @@ else
     exit 1
 fi
 
-echo -e "\n✔ SSH security hardening complete!"
-echo "Security changes applied:"
+echo -e "\n✔ SSH setup and security hardening complete!"
+echo "Changes applied:"
+echo "  - SSH key: Generated (RSA 4096) if not existing"
+echo "  - Git config: Set with smart defaults ($TARGET_USER@$(hostname))"
 echo "  - Password authentication: DISABLED"
 echo "  - Root login: DISABLED"
 echo "  - Public key authentication: ENABLED"
@@ -192,6 +243,14 @@ echo "  - Password login is now DISABLED"
 echo "  - Only SSH key authentication is allowed"
 echo "  - Root login is DISABLED"
 echo "  - Backup config saved to: $SSH_CONFIG.backup"
+echo ""
+echo "🔑 SSH Key Information:"
+echo "  - Private key: $TARGET_HOME/.ssh/id_rsa"
+echo "  - Public key: $TARGET_HOME/.ssh/id_rsa.pub"
+echo ""
+echo "🔧 Git Configuration:"
+echo "  - Name: $TARGET_USER"
+echo "  - Email: $TARGET_USER@$(hostname)"
 echo ""
 echo "💡 Test your SSH connection now:"
 echo "   ssh $TARGET_USER@<server-ip>"
