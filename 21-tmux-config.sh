@@ -35,7 +35,7 @@ set-option -g default-shell /bin/zsh
 set -g default-terminal "xterm-256color"
 
 ## Set the displaying of seconds
-set -g status-right "%H:%M:%S"
+set -g status-right "%H:%M:%S %m/%d"
 set -g status-interval 1
 
 set -g history-limit 10000

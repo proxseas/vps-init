@@ -31,7 +31,7 @@ fi
 if [ ! -f "$VIMRC" ]; then
   echo "Creating vim configuration..."
   cat > "$VIMRC" <<'EOF'
-set number relativenumber mouse=a
+set number relativenumber
 set hlsearch incsearch ignorecase wrap autoindent cursorline tabstop=2
 syntax on
 
