@@ -68,6 +68,10 @@ bind -n 'C-M-l' split-window -h
 bind -n 'C-M-j' split-window -v
 bind -n 'C-M-k' split-window -v
 
+## Alt + u|i => prev|next tmux window
+bind -n M-u previous-window
+bind -n M-i next-window
+
 ## Alt+hjkl => select pane
 bind -n M-h select-pane -L
 bind -n M-j select-pane -D
