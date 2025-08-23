@@ -63,6 +63,10 @@ nnoremap <leader>b :Buffers<CR>
 let g:highlightedyank_highlight_duration = 90
 let g:highlightedyank_highlight_group = 'IncSearch'
 
+" These create newlines like o and O but stay in normal mode
+nmap zj o<Esc>k
+nmap zk O<Esc>j
+
 " Map Ctrl+Underscore to toggle line comments in normal, visual, and insert modes
 nnoremap <C-_> :normal gcc<CR>
 vnoremap <C-_> :normal gc<CR>
