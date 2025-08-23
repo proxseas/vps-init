@@ -34,7 +34,8 @@ add_functions_block() {
 
     # Only add if marker doesn't exist
     if ! grep -q "$marker" "$file" 2>/dev/null; then
-        cat >> "$file" << EOF
+        if [[ "$marker" == "AWK_HELPERS" ]]; then
+            cat >> "$file" << EOF
 
 # $marker
 function awkn {
@@ -47,6 +48,18 @@ function awklast {
   eval "\$cmd"
 }
 EOF
+        elif [[ "$marker" == "TIMESTAMP_HELPERS" ]]; then
+            cat >> "$file" << EOF
+
+# $marker
+## human-friendly ts function
+## Examples:
+## * some_app | tee "\$(ts a.txt)"
+## * touch "\$(ts notes.md)"
+## * vim "\$(ts scratch.md)"
+ts() { date +%Y-%m-%d_%H-%M-%S | xargs -I{} printf "%s_%s\n" {} "\$1"; }
+EOF
+        fi
     fi
 }
 

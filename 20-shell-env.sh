@@ -60,6 +60,12 @@ sed -i '/source.*zsh-syntax-highlighting.*zsh-syntax-highlighting\.zsh/d' "$ZSHR
 # misc zsh tweaks
 grep -q '^EDITOR=' "$ZSHRC" 2>/dev/null || cat >> "$ZSHRC" <<'EOF'
 
+# Enable control-s and control-q - disable flow control
+stty start undef
+stty stop undef
+setopt noflowcontrol
+stty -ixon
+
 # User preferences
 EDITOR='vim'
 setopt cdablevars
@@ -86,13 +92,6 @@ PROMPT='%F{cyan}%n%f@%F{yellow}${${(%):-%m}%%-*}%f$(get_curr_git_branch) %F{gree
 
 # load aliases if present
 [ -f ~/.zsh_aliases ] && source ~/.zsh_aliases
-
-## human-friendly ts function
-## Examples:
-## * some_app | tee "$(ts a.txt)"
-## * touch "$(ts notes.md)"
-## * vim "$(ts scratch.md)"
-ts() { date +%Y-%m-%d_%H-%M-%S | xargs -I{} printf "%s_%s\n" {} "$1"; }
 
 # Suspend widget and keybind tweaks
 suspend-widget() { builtin suspend }

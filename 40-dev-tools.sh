@@ -88,13 +88,20 @@ ZSH_ALIASES="$HOME/.zsh_aliases"
 
 # General aliases
 update_alias "q" "exit" "$ZSH_ALIASES"
+
+# Edit aliases
 update_alias "editzsh" "vim ~/.zshrc" "$ZSH_ALIASES"
-update_alias "editzsh" "vim ~/.zshrc" "$ZSH_ALIASES"
-update_alias "reloadzsh" "source ~/.zshrc" "$ZSH_ALIASES"
-## editaliases and reloadaliases
-update_alias "editaliases" "vim $ZSH_ALIASES" "$ZSH_ALIASES"
-update_alias "reloadaliases" "source $ZSH_ALIASES" "$ZSH_ALIASES"
-## Others
+update_alias "edittmux" "vim ~/.tmux.conf" "$ZSH_ALIASES"
+update_alias "editaliases" "vim ~/.zsh_aliases" "$ZSH_ALIASES"
+update_alias "edithistory" "vim ~/.zsh_history" "$ZSH_ALIASES"
+update_alias "editvim" "vim ~/.vimrc" "$ZSH_ALIASES"
+
+# Reload aliases
+update_alias "reloadzsh" "exec zsh" "$ZSH_ALIASES"
+update_alias "reloadaliases" "source ~/.zsh_aliases" "$ZSH_ALIASES"
+update_alias "reloadtmux" "tmux source-file ~/.tmux.conf" "$ZSH_ALIASES"
+
+# Other general aliases
 update_alias "clr" "clear" "$ZSH_ALIASES"
 
 
@@ -120,6 +127,22 @@ update_alias "ta" "tmux attach" "$ZSH_ALIASES"
 # Docker helper
 update_alias "lzd" "lazydocker" "$ZSH_ALIASES"
 
+# Add auto-generation loops for short aliases to the aliases file
+cat >> "$ZSH_ALIASES" << 'EOF'
+
+## 'e*' edit aliases (e.g. 'ezsh' for 'editzsh')
+for a in ${(k)aliases[(I)edit*]}; do
+  short="e${a#edit}"
+  [[ -z ${aliases[$short]} ]] && alias $short="$aliases[$a]"
+done
+
+# auto-generate "rl*" aliases for every "reload*" alias
+for a in ${(k)aliases[(I)reload*]}; do
+  short="rl${a#reload}"
+  alias $short="$aliases[$a]"
+done
+EOF
+
 echo "✔ Aliases configured in $ZSH_ALIASES"
 
 ##############################################################################
@@ -129,6 +152,9 @@ print_section "Setting up shell functions"
 
 # Add awk helper functions
 add_functions_block "$ZSH_ALIASES" "AWK_HELPERS"
+
+# Add timestamp helper function
+add_functions_block "$ZSH_ALIASES" "TIMESTAMP_HELPERS"
 
 echo "✔ Shell functions configured in $ZSH_ALIASES"
 
@@ -143,6 +169,10 @@ echo "Available aliases:"
 echo "  - ls, ll, la: Directory listing with eza"
 echo "  - bat: Cat with syntax highlighting"
 echo "  - q: Quick exit"
+echo "  - edit*: Edit config files (editzsh, edittmux, editaliases, edithistory, editvim)"
+echo "  - e*: Short edit aliases (ezsh, etmux, ealiases, ehistory, evim)"
+echo "  - reload*: Reload configs (reloadzsh, reloadaliases, reloadtmux)"
+echo "  - rl*: Short reload aliases (rlzsh, rlaliases, rltmux)"
 echo "  - tl, ta: Tmux shortcuts"
 echo "  - mkvenv, actvenv, takevenv: Python virtual env helpers"
 echo "  - lzd: Lazydocker shortcut"
@@ -150,5 +180,6 @@ echo ""
 echo "Available functions:"
 echo "  - awkn N: Print field N from input (e.g., 'ls -l | awkn 3')"
 echo "  - awklast: Print last field from input (e.g., 'ls -l | awklast')"
+echo "  - ts file: Generate timestamped filename (e.g., 'vim \$(ts notes.md)')"
 echo ""
 echo "💡 Restart your terminal or run 'source ~/.zshrc' to use aliases"

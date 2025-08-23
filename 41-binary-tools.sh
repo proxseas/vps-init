@@ -86,6 +86,7 @@ update_alias "cdi" "zi" "$ZSH_ALIASES"  # interactive cd
 
 # lazygit alias
 update_alias "lg" "lazygit" "$ZSH_ALIASES"
+update_alias "lzg" "lazygit" "$ZSH_ALIASES"
 
 echo "✔ Aliases configured"
 

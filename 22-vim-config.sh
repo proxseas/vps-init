@@ -71,6 +71,17 @@ nmap zk O<Esc>j
 nnoremap <C-_> :normal gcc<CR>
 vnoremap <C-_> :normal gc<CR>
 inoremap <C-_> <Esc>:normal gcc<CR>
+
+" Both of these are needed to enable quitting via C-q
+silent !stty -ixon > /dev/null 2>/dev/null
+
+" Map Ctrl+S to save (now that it has been made available via zsh)
+nnoremap <C-s> :w<CR>
+inoremap <C-s> <Esc>:w<CR>a
+vnoremap <C-s> <Esc>:w<CR>gv
+
+" Map Ctrl+Q to quit
+map <C-Q> :q<CR>
 EOF
 
   # Install vim plugins with timeout to prevent hanging
