@@ -56,11 +56,10 @@ bind r source-file ~/.tmux.conf \; display "Manually reloaded TMUX config"
 ## Alt+m => toggle zoom for active pane
 bind -n M-m resize-pane -Z
 
-# Switch panes using Alt-arrow without prefix
-bind -n M-Left select-pane -L
-bind -n M-Right select-pane -R
-bind -n M-Up select-pane -U
-bind -n M-Down select-pane -D
+# Alt+Up: Enter copy-mode and page up
+bind -n M-Up copy-mode \; send-keys PageUp
+# Alt+Down: Enter copy-mode and page down
+bind -n M-Down copy-mode \; send-keys PageDown
 
 ## Split windows using C-M-h|j|k|l
 bind -n 'C-M-h' split-window -h
