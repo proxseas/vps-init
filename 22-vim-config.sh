@@ -32,7 +32,7 @@ if [ ! -f "$VIMRC" ]; then
   echo "Creating vim configuration..."
   cat > "$VIMRC" <<'EOF'
 set number relativenumber
-set hlsearch incsearch ignorecase wrap autoindent cursorline tabstop=2
+set hlsearch incsearch ignorecase wrap autoindent cursorline tabstop=2 shiftwidth=2
 syntax on
 
 " Set spacebar as leaderkey
