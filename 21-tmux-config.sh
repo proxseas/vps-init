@@ -55,6 +55,8 @@ bind r source-file ~/.tmux.conf \; display "Manually reloaded TMUX config"
 
 ## Alt+m => toggle zoom for active pane
 bind -n M-m resize-pane -Z
+## Alt+n => new tmux window
+bind -n M-n new-window
 
 # Alt+Up: Enter copy-mode and page up
 bind -n M-Up copy-mode \; send-keys PageUp
