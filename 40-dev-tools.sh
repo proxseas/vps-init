@@ -4,7 +4,7 @@ set -euo pipefail
 # =============================================================================
 # 40-dev-tools.sh - Development tools and aliases setup (NO SUDO)
 # =============================================================================
-# This script installs eza, just, ripgrep, bat, and sets up useful aliases.
+# This script installs eza, just, ripgrep, bat, xclip, and sets up useful aliases.
 # USAGE: ./40-dev-tools.sh (as regular user)
 # =============================================================================
 
@@ -77,6 +77,16 @@ if ! command -v bat >/dev/null && ! command -v batcat >/dev/null; then
   echo "✔ bat installed"
 else
   echo "✔ bat already installed"
+fi
+
+# 5) xclip (for clipboard functionality)
+if ! command -v xclip >/dev/null; then
+  echo "Installing xclip..."
+  sudo apt update
+  sudo apt install -y xclip
+  echo "✔ xclip installed"
+else
+  echo "✔ xclip already installed"
 fi
 
 ##############################################################################
@@ -156,6 +166,9 @@ add_functions_block "$ZSH_ALIASES" "AWK_HELPERS"
 # Add timestamp helper function
 add_functions_block "$ZSH_ALIASES" "TIMESTAMP_HELPERS"
 
+# Add clipboard helper function
+add_functions_block "$ZSH_ALIASES" "CLIPBOARD_HELPERS"
+
 echo "✔ Shell functions configured in $ZSH_ALIASES"
 
 echo -e "\n🎉 Development tools setup complete!"
@@ -164,6 +177,7 @@ echo "  - eza: Modern ls replacement"
 echo "  - just: Task runner"
 echo "  - ripgrep (rg): Fast grep replacement"
 echo "  - bat: Modern cat with syntax highlighting"
+echo "  - xclip: Clipboard utility"
 echo ""
 echo "Available aliases:"
 echo "  - ls, ll, la: Directory listing with eza"
@@ -176,10 +190,14 @@ echo "  - rl*: Short reload aliases (rlzsh, rlaliases, rltmux)"
 echo "  - tl, ta: Tmux shortcuts"
 echo "  - mkvenv, actvenv, takevenv: Python virtual env helpers"
 echo "  - lzd: Lazydocker shortcut"
+echo "  - fclip: Alias for f2clip"
 echo ""
 echo "Available functions:"
 echo "  - awkn N: Print field N from input (e.g., 'ls -l | awkn 3')"
 echo "  - awklast: Print last field from input (e.g., 'ls -l | awklast')"
 echo "  - ts file: Generate timestamped filename (e.g., 'vim \$(ts notes.md)')"
+echo "  - f2clip: Concatenate files to clipboard or file"
+echo "    * f2clip file1.txt file2.txt: Copy files to clipboard"
+echo "    * f2clip -f output.txt file1.txt: Write concatenated files to output.txt"
 echo ""
 echo "💡 Restart your terminal or run 'source ~/.zshrc' to use aliases"
