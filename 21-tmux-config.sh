@@ -45,6 +45,8 @@ set -g @plugin 'tmux-plugins/tpm'         # Always first
 
 # Below the plugin lines — initialize TPM:
 run '~/.tmux/plugins/tpm/tpm'
+## "Tmux-Menus" plugin
+set -g @plugin 'jaclu/tmux-menus'
 
 # set -g mouse on
 
