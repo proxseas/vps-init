@@ -111,6 +111,12 @@ setw -g window-status-format ' #I #[fg=white]#W #[fg=yellow]#F '
 setw -g window-status-bell-style 'fg=black bg=yellow bold'
 # clock mode
 setw -g clock-mode-colour yellow
+
+## Clearly indicate which pane is active
+# Show a status strip on pane borders
+set -g pane-border-status top
+# Bold ACTIVE tag on the focused pane, plus index and title
+set -g pane-border-format '#[bold]#{?pane_active,ACTIVE ,}#[default]  #P #[dim]#T'
 EOF
 
 echo "✔ Tmux configuration complete"
