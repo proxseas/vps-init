@@ -134,6 +134,28 @@ update_alias "takevenv" "uv venv .venv && source .venv/bin/activate && echo 'Act
 update_alias "tl" "tmux ls" "$ZSH_ALIASES"
 update_alias "ta" "tmux attach" "$ZSH_ALIASES"
 
+# Tmux session selector with fzf
+cat >> "$ZSH_ALIASES" << 'EOF'
+
+# Tmux session selector
+tm() {
+  local session
+  # 1. Get tmux ls output
+  # 2. Use fzf to display everything, but only search the first field (the name)
+  # 3. Extract the name from the selection and attach
+  session=$(tmux list-sessions 2>/dev/null | \
+    fzf --height 60% --reverse --nth 1 --delimiter ":" \
+    --preview "tmux list-windows -t \$(echo {} | cut -d: -f1)" \
+    --header "Select Tmux Session")
+
+  if [[ -n "$session" ]]; then
+    # Extract name (everything before the first colon)
+    target=$(echo "$session" | cut -d: -f1)
+    tmux attach-session -t "$target"
+  fi
+}
+EOF
+
 # Docker helper
 update_alias "lzd" "lazydocker" "$ZSH_ALIASES"
 
