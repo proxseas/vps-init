@@ -24,6 +24,9 @@ Run everything as root with automatic user switching:
 ```bash
 # As root - creates user and runs complete setup
 NEW_USER=myusername ./setup.sh
+
+# Or skip specific steps (e.g., containers)
+NEW_USER=myusername ./setup.sh --skip containers
 ```
 
 ### Option B: Step-by-Step Control
@@ -38,6 +41,60 @@ For more control over the process:
 # 2. You're now the new user in /opt/vps-init - run setup
 ./setup.sh
 ```
+
+### Option C: Selective Installation
+
+Skip or run only specific installation steps using flags:
+
+```bash
+# Skip container tools (useful for lightweight VPS or dev machines)
+./setup.sh --skip containers
+
+# Skip multiple steps (short form with -S)
+./setup.sh -S node,verify
+
+# Run only user environment setup (skip system tools and dev tools)
+./setup.sh --only user-env
+
+# Run only specific groups
+NEW_USER=myusername ./setup.sh -O system,user-env
+```
+
+**Supported IDs:**
+
+*Fine-grained (individual tools):*
+- `node` - Node.js tooling (fnm)
+- `python` - Python tooling (uv)
+- `binaries` - Core binary tools (zoxide, glow)
+- `containers` - Docker and container tools
+- `verify` - Verification scripts
+
+*Coarse-grained (groups):*
+- `system` - System setup (user creation, base packages, firewall, SSH)
+- `user-env` - User environment (zsh, tmux, vim, fzf, aliases)
+- `dev-tools` - All development tools (node, python, binaries, containers)
+
+**Common Use Cases:**
+
+```bash
+# Lightweight VPS without containers
+./setup.sh -S containers
+
+# Quick iteration on user config only
+./setup.sh -O user-env
+
+# Skip verification for faster setup
+sudo NEW_USER=devuser ./setup.sh -S verify
+
+# Install system and user env, skip all dev tools
+./setup.sh -O system,user-env
+```
+
+**Notes:**
+- `--skip` and `--only` are mutually exclusive
+- Use `--skip/-S` to exclude specific steps from full installation
+- Use `--only/-O` to run only specific steps
+- Without flags, all steps run (backward compatible)
 
 ## What Gets Installed
 
