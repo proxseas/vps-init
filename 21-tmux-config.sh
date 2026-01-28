@@ -31,7 +31,7 @@ fi
 # Create comprehensive tmux configuration
 cat > "$TMUX_CONF" <<'EOF'
 # Set zsh as default shell and terminal to xterm-256color
-set-option -g default-shell /bin/zsh
+set-option -g default-shell /usr/bin/zsh
 set -g default-terminal "xterm-256color"
 
 ## Set the displaying of seconds
