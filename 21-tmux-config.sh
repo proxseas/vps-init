@@ -40,13 +40,10 @@ set -g status-interval 1
 
 set -g history-limit 10000
 
-## Plugins
+## Plugins (all @plugin lines first, then run tpm)
 set -g @plugin 'tmux-plugins/tpm'         # Always first
-
-# Below the plugin lines — initialize TPM:
-run '~/.tmux/plugins/tpm/tpm'
-## "Tmux-Menus" plugin
 set -g @plugin 'jaclu/tmux-menus'
+run '~/.tmux/plugins/tpm/tpm'
 
 # set -g mouse on
 
@@ -118,6 +115,15 @@ set -g pane-border-status top
 # Bold ACTIVE tag on the focused pane, plus index and title
 set -g pane-border-format '#[bold]#{?pane_active,ACTIVE ,}#[default]  #P #[dim]#T'
 EOF
+
+# Install TPM plugins (avoids needing prefix+I after first run)
+if [[ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]]; then
+    echo "Installing tmux plugins (tpm, tmux-menus)..."
+    TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins" "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
+    echo "✔ Tmux plugins installed"
+else
+    echo "⚠ Run prefix+I inside tmux to install plugins (tpm, tmux-menus)"
+fi
 
 echo "✔ Tmux configuration complete"
 echo "💡 Tmux aliases (tl, ta) will be set up by dev-tools script"
