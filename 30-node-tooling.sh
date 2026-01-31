@@ -70,6 +70,7 @@ if [[ -x "$TARGET_HOME/.local/share/fnm/fnm" ]]; then
   eval "\$($TARGET_HOME/.local/share/fnm/fnm env --use-on-cd)"
   fnm install --lts || echo 'fnm install failed, continuing...'
   corepack enable || echo 'corepack enable failed, continuing...'
+  npm install -g npm@latest || echo 'npm upgrade failed, continuing...'
 else
   echo 'fnm binary not found, skipping Node.js installation'
 fi
