@@ -94,18 +94,33 @@ else
     echo "✔ glow already installed"
 fi
 
+##############################################################################
+# Install yazi (terminal file manager - not Python, but included for simplicity)
+##############################################################################
+print_section "Installing yazi (terminal file manager)"
+
+if ! command -v yazi >/dev/null 2>&1; then
+    echo "Installing yazi..."
+    snap install yazi --classic
+    echo "✔ yazi installed"
+else
+    echo "✔ yazi already installed"
+fi
+
 echo -e "\n✔ Extended Python CLI tools setup complete!"
 echo "Available tools:"
 echo "  - pipx: Python CLI tool installer"
 echo "  - glances: System monitoring tool"
 echo "  - httpie: Modern HTTP client"
 echo "  - glow: Terminal markdown reader"
+echo "  - yazi: Terminal file manager"
 echo ""
 echo "Usage:"
 echo "  - glances: System monitoring dashboard"
 echo "  - http GET api.github.com: Make HTTP requests"
 echo "  - https GET api.github.com: Make HTTPS requests"
 echo "  - glow README.md: View markdown files"
+echo "  - yazi: Launch terminal file manager"
 echo "  - pipx install <tool>: Install additional Python CLI tools"
 echo ""
 echo "💡 Tools are installed in ~/.local/bin and should be in your PATH"
