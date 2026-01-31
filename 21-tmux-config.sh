@@ -30,9 +30,13 @@ fi
 
 # Create comprehensive tmux configuration
 cat > "$TMUX_CONF" <<'EOF'
-# Set zsh as default shell and terminal to xterm-256color
+# Set zsh as default shell
 set-option -g default-shell /usr/bin/zsh
-set -g default-terminal "xterm-256color"
+# Terminal: screen-256color (tmux-friendly) + OSC 8 hyperlinks
+set -g default-terminal "screen-256color"
+set -g allow-passthrough on
+set -ga terminal-overrides ",*:Tc:RGB:sitm=\\E[3m:ritm=\\E[23m:smso=\\E[7m:rmso=\\E[27m"
+set -ga terminal-features ",*:hyperlinks:osc8"
 
 ## Set the displaying of seconds
 set -g status-right "%H:%M:%S %m/%d"
