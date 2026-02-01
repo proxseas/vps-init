@@ -107,6 +107,19 @@ else
     echo "✔ yazi already installed"
 fi
 
+##############################################################################
+# Install btop (system monitor - not Python, but included for simplicity)
+##############################################################################
+print_section "Installing btop (system monitor)"
+
+if ! command -v btop >/dev/null 2>&1; then
+    echo "Installing btop..."
+    apt install -y btop
+    echo "✔ btop installed"
+else
+    echo "✔ btop already installed"
+fi
+
 echo -e "\n✔ Extended Python CLI tools setup complete!"
 echo "Available tools:"
 echo "  - pipx: Python CLI tool installer"
@@ -114,9 +127,11 @@ echo "  - glances: System monitoring tool"
 echo "  - httpie: Modern HTTP client"
 echo "  - glow: Terminal markdown reader"
 echo "  - yazi: Terminal file manager"
+echo "  - btop: Modern system monitor"
 echo ""
 echo "Usage:"
 echo "  - glances: System monitoring dashboard"
+echo "  - btop: Modern system monitoring dashboard"
 echo "  - http GET api.github.com: Make HTTP requests"
 echo "  - https GET api.github.com: Make HTTPS requests"
 echo "  - glow README.md: View markdown files"
