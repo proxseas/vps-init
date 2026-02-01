@@ -102,12 +102,35 @@ should_run() {
 }
 
 # Helper function: Check if any of multiple IDs should run
+# IMPORTANT: First argument is the primary (fine-grained) ID, rest are group IDs
+# Fine-grained IDs explicitly skipped take precedence over group enablement
 should_run_any() {
-    for id in "$@"; do
-        if should_run "$id"; then
+    local primary_id="$1"
+    shift
+    local group_ids=("$@")
+    
+    # CRITICAL: If the primary (fine-grained) ID is explicitly skipped, don't run
+    # This ensures --skip containers works even if dev-tools is enabled
+    if [[ ${#SKIP_LIST[@]} -gt 0 ]]; then
+        for skip_id in "${SKIP_LIST[@]}"; do
+            skip_id=$(echo "$skip_id" | xargs)
+            if [[ "$skip_id" == "$primary_id" ]]; then
+                return 1
+            fi
+        done
+    fi
+    
+    # Check if primary ID or any group ID should run
+    if should_run "$primary_id"; then
+        return 0
+    fi
+    
+    for group_id in "${group_ids[@]}"; do
+        if should_run "$group_id"; then
             return 0
         fi
     done
+    
     return 1
 }
 
