@@ -36,5 +36,16 @@ else
   echo "✔ FZF already installed"
 fi
 
+# Configure FZF keybindings
+if ! grep -q 'bindkey.*fzf-file-widget' "$ZSHRC" 2>/dev/null; then
+  echo "Configuring FZF keybindings..."
+  cat >> "$ZSHRC" <<'FZFEOF'
+
+# Change FZF file widget from Ctrl+T to Ctrl+P
+bindkey '^P' fzf-file-widget
+FZFEOF
+  echo "✔ FZF keybindings configured"
+fi
+
 echo "✔ FZF configuration complete"
-echo "💡 Use Ctrl+R for fuzzy history, Ctrl+T for fuzzy file search"
+echo "💡 Use Ctrl+R for fuzzy history, Ctrl+P for fuzzy file search"

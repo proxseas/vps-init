@@ -101,6 +101,15 @@ bindkey -r '^[l'               # free Alt+l
 bindkey -M emacs '^Z' suspend-widget
 bindkey -M viins '^Z' suspend-widget
 
+# Set up Ctrl+O to run 'zi' (zoxide interactive)
+_zi_widget() {
+  zle push-input  # Save current command line
+  BUFFER='zi'     # Set the command to run
+  zle accept-line # Execute it
+}
+zle -N _zi_widget         # Register as a zle widget
+bindkey '^O' _zi_widget   # Bind Ctrl+O to the widget
+
 # zoxide init (with z.sh fallback) - will be added by binary-tools script if installed
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"

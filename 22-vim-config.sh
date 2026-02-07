@@ -67,6 +67,11 @@ let g:highlightedyank_highlight_group = 'IncSearch'
 nmap zj o<Esc>k
 nmap zk O<Esc>j
 
+" Quickly exit INSERT mode by pressing one of these
+inoremap jk <Esc>
+inoremap kj <Esc>
+inoremap jj <Esc>
+
 " Map Ctrl+Underscore to toggle line comments in normal, visual, and insert modes
 nnoremap <C-_> :normal gcc<CR>
 vnoremap <C-_> :normal gc<CR>

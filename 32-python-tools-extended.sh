@@ -79,6 +79,9 @@ ZSH_ALIASES="$TARGET_HOME/.zsh_aliases"
 update_alias "http" "http" "$ZSH_ALIASES"
 update_alias "https" "https" "$ZSH_ALIASES"
 
+# yazi alias
+update_alias "y" "yazi" "$ZSH_ALIASES"
+
 echo "✔ Aliases configured"
 
 ##############################################################################
@@ -135,7 +138,7 @@ echo "  - btop: Modern system monitoring dashboard"
 echo "  - http GET api.github.com: Make HTTP requests"
 echo "  - https GET api.github.com: Make HTTPS requests"
 echo "  - glow README.md: View markdown files"
-echo "  - yazi: Launch terminal file manager"
+echo "  - y or yazi: Launch terminal file manager"
 echo "  - pipx install <tool>: Install additional Python CLI tools"
 echo ""
 echo "💡 Tools are installed in ~/.local/bin and should be in your PATH"

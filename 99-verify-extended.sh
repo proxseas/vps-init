@@ -93,6 +93,7 @@ check_command "glow" "glow markdown reader"
 check_alias "fd" "fd alias"
 check_alias "http" "http alias"
 check_alias "https" "https alias"
+check_alias "y" "y (yazi) alias"
 
 # PATH for extended tools
 [[ "$VERBOSE" == "true" ]] && print_section "Extended PATH"

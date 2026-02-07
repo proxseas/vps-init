@@ -97,6 +97,24 @@ check_directory() {
     fi
 }
 
+# Function to check if a file contains specific content
+check_file_content() {
+    local file="$1"
+    local pattern="$2"
+    local description="$3"
+
+    TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
+
+    if [[ -f "$file" ]] && grep -q "$pattern" "$file" 2>/dev/null; then
+        [[ "$VERBOSE" == "true" ]] && echo -e "${GREEN}✓${NC} $description"
+        PASSED_CHECKS=$((PASSED_CHECKS + 1))
+    else
+        [[ "$VERBOSE" == "true" ]] && echo -e "${RED}✗${NC} $description"
+        FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        FAILED_ITEMS+=("$description")
+    fi
+}
+
 # Function to check if a service is running
 check_service() {
     local service="$1"
@@ -179,9 +197,12 @@ check_file "$HOME/.zshrc" "Zsh config"
 check_file "$HOME/.zsh_aliases" "Zsh aliases"
 check_directory "$HOME/.fzf" "FZF"
 check_file "$HOME/.fzf.zsh" "FZF integration"
+check_file_content "$HOME/.zshrc" "bindkey '\^P' fzf-file-widget" "FZF Ctrl+P keybinding"
+check_file_content "$HOME/.zshrc" "_zi_widget" "Zoxide Ctrl+O widget"
 check_file "$HOME/.tmux.conf" "Tmux config"
 check_file "$HOME/.vimrc" "Vim config"
 check_directory "$HOME/.vim/plugged" "Vim plugins"
+check_file_content "$HOME/.vimrc" "inoremap jk <Esc>" "Vim quick escape mappings"
 
 # Development Tools
 [[ "$VERBOSE" == "true" ]] && print_section "Development Tools"
